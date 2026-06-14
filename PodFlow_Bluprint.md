@@ -289,37 +289,44 @@ Below is the entire, robust, production-tested code for both the FastAPI Backend
 ### **5.1 Project Setup Directory Structure**
 
 podflow/
-├── .env                           # Root environment variables (API keys, Client IDs)
-├── requirements.txt               # Backend Python dependencies
-├── credentials/
-│   ├── gmail_credentials.json     # Google Cloud Console OAuth secrets client file (Git-ignored)
-│   └── token.json                 # Auto-generated or pre-authenticated user token (Git-ignored)
+├── .env                           # 1. Place backend GOOGLE_API_KEY & GOOGLE_CLIENT_ID here
+├── requirements.txt               # 2. Python 3.13 package dependency list
+├── Dockerfile                     # 3. Backend multi-stage production Dockerfile
+├── docker-compose.yml             # 4. Multi-container orchestration manager
+├── .github/                       # Create this folder for your CI/CD automation
+│   └── workflows/
+│       └── ci.yml                 # 5. GitHub Actions CI & Automated Release Workflow
+├── credentials/                   # Create this folder manually
+│   ├── gmail_credentials.json     # 6. Place Google OAuth client JSON here (from GCP Console)
+│   └── token.json                 # Auto-generated locally after first login (Git-ignored)
 │
-├── src/                           # Backend Python Engine Source
+├── src/                           # Backend Source Modules
 │   ├── __init__.py
-│   ├── api.py                     # FastAPI server instance and auth/routing controllers
-│   ├── graph.py                   # LangGraph agent topography compilation
-│   ├── state.py                   # Strictly typed TypedDict pipeline state schema
-│   └── agents/                    # PodFlow processing worker blocks
+│   ├── api.py                     # 7. FastAPI gateway & Google JWT auth endpoint
+│   ├── graph.py                   # 8. LangGraph pipeline workflow topography
+│   ├── state.py                   # 9. TypedDict state schema
+│   └── agents/
 │       ├── __init__.py
-│       ├── email_dispatcher.py    # HTML email parser & Gmail delivery dispatcher
-│       ├── insight_extractor.py   # Gemini podcast analytical insight engine
-│       ├── newsletter_writer.py   # Gemini magazine-style copywriter agent
-│       └── transcript_extractor.py# YouTube validation and CC fallback extractor
+│       ├── email_dispatcher.py    # 10. HTML template parser & Gmail dispatcher
+│       ├── insight_extractor.py   # 11. Gemini summary and thematic analyzer
+│       ├── newsletter_writer.py   # 12. Gemini conversational newsletter writer
+│       └── transcript_extractor.py# 13. YouTube CC transcript crawler
 │
-└── frontend/                      # Frontend Application Module (Auto-scaffolded by Vite)
-    ├── .env.local                 # Local client-side backend routing maps
-    ├── package.json               # Frontend dependencies & deployment scripts
-    ├── postcss.config.js          # PostCSS asset utility compiler rules
-    ├── tailwind.config.js         # Tailwind configuration rules
-    ├── vite.config.js             # Vite development pipeline and dev-server parameters
-    ├── index.html                 # App entry markup frame (includes Google Identity script target)
-    ├── public/                    # Raw static assets
-    └── src/                       # React Application Workspace
-        ├── App.jsx                # Main workspace container & custom protected layout router
-        ├── api.js                 # API wrapper handling login verification and pipeline calls
-        ├── index.css              # Global styles with injected Tailwind core engines
-        └── main.jsx               # React DOM injection orchestration file 
+└── frontend/                      # React Frontend Module (Vite)
+    ├── .env.local                 # 14. Client-side backend route mappings
+    ├── package.json               # 15. Node.js dependency descriptors
+    ├── postcss.config.js          # PostCSS configurations
+    ├── tailwind.config.js         # Tailwind utility compilation specs
+    ├── vite.config.js             # Vite development server rules
+    ├── index.html                 # Main markup page with Google Identity script tag
+    ├── Dockerfile                 # 16. Frontend Node compilation & Nginx web server Dockerfile
+    └── src/
+        ├── App.jsx                # 17. App workspace UI & custom protected router
+        ├── api.js                 # 18. Frontend fetch utilities
+        ├── index.css              # 19. Custom styles containing Tailwind imports
+        └── main.jsx               # React virtual DOM entry
+
+ 
 
 
 ## **Architecture: Authentication & Protected Flow**
