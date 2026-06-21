@@ -1,15 +1,18 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
 
-export async function verifyBackendToken(token) {
-    const res = await fetch(`${API_URL}/auth/verify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_token: token }),
-    });
-    if (!res.ok) throw new Error("Cryptographic session verification rejected.");
-    return res.json();
-}
+async function parseResponse(res, fallbackMessage) {
+    if (res.ok) return res.json();
 
+    let message = fallbackMessage;
+    try {
+        const errorBody = await res.json();
+        message = errorBody.detail || message;
+    } catch {
+        // Keep the fallback when the backend returns a non-JSON error.
+    }
+
+    throw new Error(message);
+}
 
 export async function runPipeline(youtubeUrl) {
     const res = await fetch(`${API_URL}/run`, {
@@ -17,8 +20,7 @@ export async function runPipeline(youtubeUrl) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ youtube_url: youtubeUrl }),
     });
-    if (!res.ok) throw new Error("Failed to start pipeline.");
-    return res.json();
+    return parseResponse(res, "Failed to start pipeline.");
 }
 
 
@@ -28,7 +30,7 @@ export async function resumeInsights(threadId, decision, insights) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ thread_id: threadId, decision, insights }),
     });
-    return res.json();
+    return parseResponse(res, "Failed to resume insights review.");
 }
 
 export async function resumeNewsletter(threadId, decision, newsletter, email) {
@@ -37,5 +39,5 @@ export async function resumeNewsletter(threadId, decision, newsletter, email) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ thread_id: threadId, decision, newsletter, email }),
     });
-    return res.json();
+    return parseResponse(res, "Failed to resume newsletter review.");
 }

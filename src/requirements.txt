@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+langgraph
+langchain-core
+google-genai
+google-auth-oauthlib
+google-api-python-client
+google-auth
+youtube-transcript-api
+python-dotenv
+pydantic
