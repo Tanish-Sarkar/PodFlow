@@ -1,8 +1,6 @@
 import re
-# pyrefly: ignore [missing-import]
 from youtube_transcript_api import YouTubeTranscriptApi
-# pyrefly: ignore [missing-import]
-from youtube_transcript_api.errors import TranscriptsDisabled, NoTranscriptFound
+from youtube_transcript_api import NoTranscriptFound, TranscriptsDisabled, YouTubeTranscriptApiException
 from src.state import PipelineState
 
 def extract_video_id(url: str) -> str:
@@ -27,23 +25,30 @@ def transcript_extractor_agent(state: PipelineState) -> PipelineState:
 
 
     try:
-        transcript_list = YouTubeTranscriptApi.get_transcript(video_id, languages=['en', 'en-US'])
-        full_transcript = " ".join([enter["text"] for enter in transcript_list])
-    except (TranscriptsDisabled, Exception, NoTranscriptFound):
+        transcript_api = YouTubeTranscriptApi()
+        fetched = transcript_api.fetch(video_id, languages=["en", "en-US"])
+        full_transcript = " ".join(snippet.text for snippet in fetched)
+    except NoTranscriptFound:
         try:
-            transcript_list_fallback = YouTubeTranscriptApi.list_transcripts(video_id)
-            fetched = transcript_list_fallback.find_transcript(["en"]).fetch()
-            full_transcript = " ".join([entry["text"] for entry in fetched])
-        except Exception:
+            transcript_list = transcript_api.list(video_id)
+            fetched = transcript_list.find_transcript(["en", "en-US"]).fetch()
+            full_transcript = " ".join(snippet.text for snippet in fetched)
+        except (NoTranscriptFound, TranscriptsDisabled) as e:
             raise RuntimeError(
-                f"Transcript extraction failed for video {video_id}. "
-                "Ensure closed-captions or transcripts are enabled on this video."
+                f"Transcript extraction failed for video {video_id}: {str(e)}"
             )
+    except TranscriptsDisabled:
+        raise RuntimeError(
+            f"Transcript extraction failed for video {video_id}. "
+            "Transcripts are disabled for this video."
+        )
+    except YouTubeTranscriptApiException as e:
+        raise RuntimeError(f"Transcript extraction failed for video {video_id}: {str(e)}")
 
 
     return {
         **state,
-        "full_transcript": full_transcript,
+        "transcript": full_transcript,
         "current_step": "transcript_extracted"
     }
 

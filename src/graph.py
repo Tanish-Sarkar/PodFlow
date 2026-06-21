@@ -22,9 +22,9 @@ def insight_review_node(state: PipelineState) -> PipelineState:
 
 
 def route_after_insights(state: PipelineState) -> str:
-    if state.get("insights_decision") in ["approved", "edit"]:
+    if state.get("insights_decision") == "approve":
         return "newsletter_writer"
-    return "insigh_extractor"
+    return "insight_extractor"
 
 def newsletter_review_node(state: PipelineState) -> PipelineState:
     human_input = interrupt({
@@ -41,10 +41,10 @@ def newsletter_review_node(state: PipelineState) -> PipelineState:
 
 
 def route_after_newsletter(state: PipelineState) -> str:
-    decision = state.get("newsletter_decision", "approved")
+    decision = state.get("newsletter_decision", "approve")
     if decision == "approve":
         return "email_dispatcher"
-    elif decision == "edit":
+    elif decision == "rewrite":
         return "newsletter_writer"
     return "insight_extractor"
 

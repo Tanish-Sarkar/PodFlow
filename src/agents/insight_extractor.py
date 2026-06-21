@@ -1,19 +1,10 @@
-import os
-# pyrefly: ignore [missing-import]
-import google.generativeai as genai
+from src.agents.gemini_client import generate_text
 from src.state import PipelineState
 
 def insight_extractor_agent(state: PipelineState) -> PipelineState:
-    api_key = os.getenv("GOOGLE_API_KEY", "")
-    if not api_key:
-        raise ValueError("Missing GOOGLE_API_KEY environment variable.")
-        
-    genai.configure(api_key=api_key)
-
     raw_transcript = state.get("transcript", "")
-    truncated_transcript = raw_transcript[:25000] # Clean optimization threshold
-
-    model = genai.GenerativeModel("gemini-2.5-flash")
+    # Clean optimization threshold
+    truncated_transcript = raw_transcript[:25000] 
 
     prompt = f"""You are an elite podcast analyst.
             Given the transcript below, extract the most critical insights and output them using structured Markdown.
@@ -45,9 +36,8 @@ def insight_extractor_agent(state: PipelineState) -> PipelineState:
             Transcript Block:
             {truncated_transcript}"""
 
-    response = model.generate_content(prompt)
     return {
         **state,
-        "raw_insights": response.text,
+        "raw_insights": generate_text(prompt),
         "current_step": "insights_extracted"
     }
