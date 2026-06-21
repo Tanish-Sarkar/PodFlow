@@ -1,17 +1,8 @@
-import os
-# pyrefly: ignore [missing-import]
-import google.generativeai as genai
+from src.agents.gemini_client import generate_text
 from src.state import PipelineState
 
 def newsletter_writer_agent(state: PipelineState) -> PipelineState:
-    api_key = os.getenv("GOOGLE_API_KEY", "")
-    if not api_key:
-        raise ValueError("Missing GOOGLE_API_KEY environment variable.")
-    
-    genai.configure(api_key=api_key)
     insights = state.get("approved_insights") or state.get("raw_insights", "")
-
-    model = genai.GenerativeModel("gemini-1.5-flash")
 
     prompt = f"""You are a world-class technology newsletter writer in the style of 'The Hustle' and 'Morning Brew'.
             Convert the provided structured podcast insights into an engaging, magazine-style newsletter edition.
@@ -27,9 +18,8 @@ def newsletter_writer_agent(state: PipelineState) -> PipelineState:
             Podcast Insights Source:
             {insights}"""
     
-    response = model.generate_content(prompt)
     return {
         **state,
-        "newsletter_draft": response.text,
+        "newsletter_draft": generate_text(prompt),
         "current_step": "newsletter_drafted"
     }
