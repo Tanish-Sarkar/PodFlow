@@ -1,7 +1,6 @@
-.env
-credentials
 venv
-src/virtual
-src/__pycache__
-src/agents/__pycache__
-frontend/__pycache__
+
+.env
+
+credentials
+
