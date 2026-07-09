@@ -4,10 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl
 from dotenv import load_dotenv
 from langgraph.types import Command
+from src.graph import pipeline
 
 load_dotenv()
-
-from src.graph import pipeline
 
 app = FastAPI(title="PodFlow AI")
 
