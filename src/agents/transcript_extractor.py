@@ -25,12 +25,12 @@ def transcript_extractor_agent(state: PipelineState) -> PipelineState:
 
 
     try:
-        transcript_api = YouTubeTranscriptApi()
-        fetched = transcript_api.fetch(video_id, languages=["en", "en-US"])
+        ytt_api = YouTubeTranscriptApi()
+        fetched = ytt_api.fetch(video_id, languages=["en", "en-US"])
         full_transcript = " ".join(snippet.text for snippet in fetched)
     except NoTranscriptFound:
         try:
-            transcript_list = transcript_api.list(video_id)
+            transcript_list = ytt_api.list(video_id)
             fetched = transcript_list.find_transcript(["en", "en-US"]).fetch()
             full_transcript = " ".join(snippet.text for snippet in fetched)
         except (NoTranscriptFound, TranscriptsDisabled) as e:
