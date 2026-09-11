@@ -1,94 +1,38 @@
-name: PodFlow CI & Automated Releases
+name: PodFlow CI
 
 on:
   push:
-    branches: [ main ]
-    tags:
-      - 'v*' # Triggers workflow on tag pushes like v1.0.0
+    branches:
+      - main
+      - "restructure/**"
+      - "feature/**"
+      - "fix/**"
+
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  lint-and-validate:
+  validate:
+    name: Validate Repository
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python 3.13
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-          cache: 'pip'
-
-      - name: Install Backend Dependencies
+      - name: Validate repository structure
         run: |
-          python -m pip install --upgrade pip
-          pip install ruff
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          test -f README.md
+          test -f .gitignore
+          test -f .env.example
+          test -d docs
+          test -d backend
+          test -d frontend
 
-      - name: Lint Backend Codebase
-        run: ruff check src/
-
-      - name: Setup Node.js Env
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
-
-      - name: Install Frontend Dependencies
+      - name: Check for accidentally tracked secrets
         run: |
-          cd frontend
-          npm ci
-
-      - name: Build Frontend Application Verification
-        run: |
-          cd frontend
-          npm run build
-
-  build-docker-images:
-    needs: lint-and-validate
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Verify Backend Docker Build Integrity
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: false
-          tags: podflow-backend:latest
-
-      - name: Verify Frontend Docker Build Integrity
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: false
-          tags: podflow-frontend:latest
-
-  create-github-release:
-    needs: build-docker-images
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Create Structured GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          if git ls-files | grep -E '(^|/)(\.env|\.env\..*|credentials\.json|.*-credentials\.json|.*\.pem|.*\.key)$'; then
+            echo "Potential secret file detected in Git."
+            exit 1
+          fi

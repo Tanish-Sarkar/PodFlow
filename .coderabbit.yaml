@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+language: "en-US"
+
+reviews:
+  profile: "assertive"
+
+  high_level_summary: true
+
+  request_changes_workflow: true
+
+  auto_review:
+    enabled: true
+    drafts: false
+
+  path_instructions:
+    - path: "backend/**"
+      instructions: |
+        Review this as production Python/FastAPI backend code.
+        Pay particular attention to:
+        - correctness and error handling
+        - API contract consistency
+        - authentication and authorization
+        - database access patterns
+        - SQL injection and security issues
+        - async/sync correctness
+        - type safety
+        - testability
+        - unnecessary coupling
+
+    - path: "frontend/**"
+      instructions: |
+        Review this as production React/TypeScript code.
+        Pay particular attention to:
+        - component architecture
+        - state management
+        - API integration
+        - accessibility
+        - error/loading states
+        - security
+        - unnecessary re-renders
+        - type safety
+
+    - path: "docs/**"
+      instructions: |
+        Check documentation for technical correctness,
+        consistency with the implementation, and contradictions
+        with the project's architecture.
+
+    - path: ".github/**"
+      instructions: |
+        Review CI/CD workflows for security, correctness,
+        dependency handling, secrets exposure, and reliability.
+
+    - "tests/**"
+      instructions: |
+        Check test quality, edge cases, isolation, determinism,
+        and whether important behavior is actually covered.
+
+chat:
+  auto_reply: true
