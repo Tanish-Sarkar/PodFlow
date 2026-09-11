@@ -12,6 +12,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Validate Repository
@@ -21,18 +24,66 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate repository structure
+      - name: Validate required files
+        shell: bash
         run: |
-          test -f README.md
-          test -f .gitignore
-          test -f .env.example
-          test -d docs
-          test -d backend
-          test -d frontend
+          set -euo pipefail
 
-      - name: Check for accidentally tracked secrets
+          required_files=(
+            "README.md"
+            "LICENSE"
+            ".gitignore"
+            ".env.example"
+            ".coderabbit.yaml"
+            ".github/workflows/ci.yml"
+            "docs/README.md"
+          )
+
+          for file in "${required_files[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              echo "Missing required file: $file"
+              exit 1
+            fi
+          done
+
+      - name: Validate documentation set
+        shell: bash
         run: |
-          if git ls-files | grep -E '(^|/)(\.env|\.env\..*|credentials\.json|.*-credentials\.json|.*\.pem|.*\.key)$'; then
+          set -euo pipefail
+
+          required_docs=(
+            "01_PRD.md"
+            "02_TRD.md"
+            "03_API_Endpoints.md"
+            "04_Schemas.md"
+            "05_Testing_Rules_and_Tests.md"
+            "06_POC.md"
+            "07_Phase_Milestones.md"
+            "08_Dev_and_Agents_Environment.md"
+            "09_UI_Design_System.md"
+            "10_Deployment_and_CICD.md"
+            "11_ADR_and_Missing_Docs.md"
+            "12_Repo_Migration_and_Branch_Plan.md"
+          )
+
+          for doc in "${required_docs[@]}"; do
+            if [[ ! -f "docs/$doc" ]]; then
+              echo "Missing required document: docs/$doc"
+              exit 1
+            fi
+          done
+
+      - name: Check for tracked secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git ls-files | grep -E '(^|/)(\.env|\.env\..*|credentials/|.*-credentials\.json|.*credentials\.json|.*\.pem|.*\.key|.*token\.json)$'; then
             echo "Potential secret file detected in Git."
             exit 1
           fi
+
+          echo "No known secret file patterns are tracked."
+
+      - name: Repository validation passed
+        run: echo "PodFlow repository validation passed."
