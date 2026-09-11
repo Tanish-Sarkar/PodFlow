@@ -1,9 +1,55 @@
-venv
-
+cat > .gitignore <<'EOF'
+# Environment
 .env
+.env.*
+!.env.example
+!.env.test
+!.env.test.example
 
-virtual
-credentials
+# Secrets / credentials
+credentials/
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*.json
+*secret*.json
+*token*.json
 
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.envrc
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+.turbo/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+
+# Local data
+tmp/
+data/
+EOF
