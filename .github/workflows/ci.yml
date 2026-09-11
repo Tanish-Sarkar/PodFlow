@@ -78,8 +78,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          if git ls-files | grep -E '(^|/)(\.env|\.env\..*|credentials/|.*-credentials\.json|.*credentials\.json|.*\.pem|.*\.key|.*token\.json)$'; then
-            echo "Potential secret file detected in Git."
+          tracked_secrets="$(
+            git ls-files |
+              grep -E '(^|/)\.env(\..*)?$|(^|/)credentials/|(^|/).*credentials\.json$|(^|/).*\.pem$|(^|/).*\.key$|(^|/)token\.json$' |
+              grep -vE '(^|/)\.env\.example$' ||
+              true
+          )"
+
+          if [[ -n "$tracked_secrets" ]]; then
+            echo "Potential secret file detected in Git:"
+            printf '%s\n' "$tracked_secrets"
             exit 1
           fi
 
