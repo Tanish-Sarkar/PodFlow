@@ -1,5 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from podflow.db.session import get_db
 
 router = APIRouter(prefix="/health", tags=["health"])
 
@@ -17,9 +21,14 @@ def health_live() -> HealthResponse:
 
 
 @router.get("/ready", response_model=HealthResponse)
-def health_ready() -> HealthResponse:
+async def health_ready(response: Response, db: AsyncSession = Depends(get_db)) -> HealthResponse:
     """
     Readiness probe. Indicates if the application is ready to handle requests.
-    Future milestones will add subsystem dependency checks here.
+    Checks database connectivity.
     """
-    return HealthResponse(status="ok")
+    try:
+        await db.execute(text("SELECT 1"))
+        return HealthResponse(status="ok")
+    except Exception:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        return HealthResponse(status="error")

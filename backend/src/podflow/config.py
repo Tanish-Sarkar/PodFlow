@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_url: str = "http://localhost:3000"
     api_url: str = "http://localhost:8000"
+    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/podflow"
 
 
 def get_settings() -> Settings:
