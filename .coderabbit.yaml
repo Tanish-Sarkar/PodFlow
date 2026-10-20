@@ -52,7 +52,7 @@ reviews:
         Review CI/CD workflows for security, correctness,
         dependency handling, secrets exposure, and reliability.
 
-    - "tests/**"
+    - path: "**/tests/**"
       instructions: |
         Check test quality, edge cases, isolation, determinism,
         and whether important behavior is actually covered.

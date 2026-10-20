@@ -4,7 +4,12 @@ const isProduction = process.env.NODE_ENV === "production";
 
 // Canonical URL, sitemap and og:image need a real origin; without one Next.js falls
 // back to localhost for og:image. Say so once per production build.
-if (isProduction && !process.env.NEXT_PUBLIC_SITE_URL?.trim() && process.env.VERCEL_ENV !== "preview") {
+if (
+  isProduction &&
+  process.argv.includes("build") &&
+  !process.env.NEXT_PUBLIC_SITE_URL?.trim() &&
+  process.env.VERCEL_ENV !== "preview"
+) {
   console.warn(
     "[podflow] NEXT_PUBLIC_SITE_URL is not set: no canonical URL or sitemap will be emitted and og:image will not point at a public host. Set it for production deployments.",
   );
