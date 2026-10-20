@@ -18,6 +18,7 @@
 12. `11_ADR_and_Missing_Docs.md` — ADR register and required follow-up docs
 13. `12_Repo_Migration_and_Branch_Plan.md` — historical migration record; not active instructions
 14. `13_Platform_Monorepo_and_Extension_Architecture.md` — client/connector and future monorepo boundaries
+15. `14_Marketing_Landing_Page_UI_UX_Spec.md` — public landing page content, visual, motion, SEO, and accessibility specification
 
 ## Core architecture
 

@@ -409,3 +409,5 @@ Introduce consented feedback, preference profiles, evaluation dashboards, contro
 ## 17. Relationship to existing documents
 
 This document supersedes conflicting high-level statements in earlier planning documents. The older files remain useful detailed input, especially for test strategy, deployment, data schemas, and the original POC. They must be reconciled before implementation begins, particularly where they describe extensions/connectors as purely future work or assume mandatory human review for every artifact.
+
+The public marketing page is specified separately in `14_Marketing_Landing_Page_UI_UX_Spec.md`. It is a public SEO experience and must remain distinct from authenticated workspace/help routes.
