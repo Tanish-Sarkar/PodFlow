@@ -1,11 +1,13 @@
 # PodFlow --- Deployment and CI/CD
 
+> **Status:** Supporting deployment specification. Extend this plan as the PWA, extension, and model-hosting approach are selected.
+
 ## Target
 
 ``` text
 GitHub
   |
-  +--> Vercel  -> Next.js
+  +--> Vercel  -> Next.js (dashboard, PWA, public website views)
   |
   +--> Render  -> FastAPI
   |
@@ -31,6 +33,18 @@ credentials to the browser.
 Deploy Next.js. Public variables may include Supabase URL/key and API
 base URL. Server-only secrets must never use public environment variable
 prefixes.
+
+## Chrome extension
+
+Ship the extension as a separately versioned client. It uses the public
+authenticated API and contains no database, service-role, model-provider,
+or privileged integration credentials.
+
+## Model deployments
+
+Open-weight model hosting, model weights, and evaluation datasets require
+a separate deployment decision. Record model version, prompt version,
+evaluation result, latency, and cost for production changes.
 
 ## Render
 

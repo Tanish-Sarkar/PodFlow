@@ -2,13 +2,14 @@
 
 ## Status
 
-Proposed architecture specification for PodFlow V2.1.
-
-This document extends the existing PodFlow V2 engineering documents. It does not replace them.
+Supporting architecture specification for PodFlow V2. The master
+specification controls product priority. Chrome extension work is a V2
+phase after the core pipeline; third-party connectors follow after that.
 
 ## 1. Purpose
 
-PodFlow is intended to evolve from a web application into a programmable AI knowledge platform.
+PodFlow is a knowledge platform with a web application and planned client
+entry points, including a PWA and Chrome extension.
 
 The platform must support:
 - a web application;
@@ -381,8 +382,7 @@ Each ADR should record the decision, alternatives, consequences, and status.
 
 Until the boundaries are sufficiently defined:
 - do not implement a plugin marketplace;
-- do not implement arbitrary third-party extensions;
-- do not create a generic plugin runtime;
+- do not implement arbitrary third-party extensions or a generic plugin runtime;
 - do not introduce microservices;
 - do not introduce a message broker without a demonstrated need;
 - do not expose direct database access to clients;
@@ -409,7 +409,7 @@ If no, reconsider the boundary.
 
 ## 22. Current Recommendation
 
-Keep the current repository structure while implementing the first backend foundation. Do not perform a speculative monorepo migration yet.
+Keep the current repository structure while implementing the first backend foundation. Do not perform a speculative monorepo migration yet. The PWA and Chrome extension are planned clients of the central API, not plugins that bypass it.
 
 First establish:
 - FastAPI application;

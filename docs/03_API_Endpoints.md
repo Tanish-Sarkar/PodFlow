@@ -1,5 +1,7 @@
 # PodFlow --- API Endpoints
 
+> **Status:** Endpoint inventory, not the final OpenAPI contract. The master specification defines the current product scope; exact request/response schemas remain to be designed.
+
 Base path: `/api/v1`
 
 ## Auth
@@ -32,6 +34,9 @@ FastAPI.
     review.
 -   `POST /workflows/runs/{run_id}/cancel` --- cancel run.
 
+Runs accept a collection of authorized source references and/or uploaded
+resources, rather than assuming a single source.
+
 ## Artifacts
 
 -   `GET /artifacts` --- list with status/source/tag/favorite/archive
@@ -43,12 +48,24 @@ FastAPI.
     version.
 -   `PATCH /artifacts/{artifact_id}` --- edit.
 -   `POST /artifacts/{artifact_id}/publish` --- publish/finalize.
--   `POST /artifacts/{artifact_id}/share` --- temporary public link.
--   `DELETE /artifacts/{artifact_id}/share` --- revoke sharing.
+
+## Chat
+
+-   `POST /chats` --- create a chat session with artifact/source attachments.
+-   `PATCH /chats/{chat_id}/attachments` --- attach, remove, or swap active knowledge.
+-   `POST /chats/{chat_id}/messages` --- produce a cited answer from the active scope.
+-   `GET /chats/{chat_id}` --- chat history and attachment state.
+
+## Presentations and shares
+
+-   `POST /artifacts/{artifact_id}/presentations` --- generate a structured website view.
+-   `GET /presentations/{presentation_id}` --- authenticated preview/read.
+-   `POST /presentations/{presentation_id}/share` --- create a 24-hour public link.
+-   `DELETE /presentations/{presentation_id}/share` --- revoke sharing.
 
 ## Exports
 
--   `POST /artifacts/{artifact_id}/exports` --- Markdown/PDF/DOCX export
+-   `POST /artifacts/{artifact_id}/exports` --- Markdown/JSON/PDF/DOCX export
     job.
 -   `GET /exports/{export_id}` --- export status/location.
 
@@ -57,6 +74,13 @@ FastAPI.
 -   `GET /integrations` --- connected integrations.
 -   `POST /integrations/gmail/connect` --- begin Gmail authorization.
 -   `POST /integrations/gmail/send` --- send artifact/export.
+
+## Recipients and campaigns
+
+-   `POST /recipient-lists/imports` --- import a CSV/XLSX list and validate rows.
+-   `GET /recipient-lists/{list_id}` --- review accepted, invalid, and duplicate recipients.
+-   `POST /campaigns` --- prepare a newsletter delivery from an artifact version.
+-   `POST /campaigns/{campaign_id}/send` --- explicitly send a reviewed campaign.
 
 ## Health
 

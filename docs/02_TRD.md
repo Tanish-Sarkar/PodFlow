@@ -1,9 +1,11 @@
 # PodFlow --- Technical Requirements Document
 
+> **Status:** Supporting technical specification. Read with `00_PodFlow_V2_Master_Specification.md`, which resolves product-scope conflicts.
+
 ## Architecture
 
 ``` text
-Next.js / React / TypeScript
+Dashboard / PWA / Chrome Extension / Future Connectors
             |
        REST / OpenAPI
             v
@@ -11,10 +13,11 @@ Next.js / React / TypeScript
             |
    +--------+---------+----------------+
    |                  |                |
-Workflow          Knowledge        Integrations
-Engine             Engine
+Workflow          Knowledge        Delivery
+Engine             Engine           Service
    |                  |                |
-LangGraph       Ingestion/RAG      Gmail/etc.
+Durable runs    Ingestion/RAG      Presentations, exports,
+                                sharing, Gmail/etc.
    |                  |
    +--------+---------+
             |
@@ -28,11 +31,14 @@ LangGraph       Ingestion/RAG      Gmail/etc.
 
 | Concern | Decision |
 | :--- | :--- |
-| **Frontend** | Next.js + React + TypeScript |
+| **Frontend** | Next.js + React + TypeScript; responsive PWA |
+| **Extension** | Chrome extension as an authenticated API client |
 | **UI** | Tailwind CSS + component system |
 | **Server state** | TanStack Query |
 | **Workflow UI** | React Flow |
-| **Backend** | FastAPI + Python |
+| **Backend** | FastAPI + Python 3.13 only after dependency compatibility validation |
+| **Python tooling** | `uv` with pinned dependencies and lockfile |
+| **Frontend tooling** | Bun with pinned dependencies and lockfile, after Next.js compatibility validation |
 | **ORM** | SQLAlchemy 2.x |
 | **Migrations** | Alembic |
 | **Database** | Supabase PostgreSQL |
@@ -40,7 +46,7 @@ LangGraph       Ingestion/RAG      Gmail/etc.
 | **Object storage** | Supabase Storage |
 | **Auth** | Supabase Auth + Google OAuth |
 | **Orchestration** | LangGraph |
-| **LLM** | Provider abstraction; Gemini initially |
+| **LLM** | Provider abstraction; evaluated open-weight models initially |
 | **API** | FastAPI-generated OpenAPI |
 | **CI** | GitHub Actions |
 | **Review** | CodeRabbit + human review |
@@ -82,11 +88,23 @@ Start with vector similarity, metadata filtering and top-k retrieval.
 Add hybrid retrieval only if evaluation demonstrates a need. Do not
 introduce a dedicated vector DB without measured justification.
 
-## AI generation
+## AI generation and improvement
 
 LLM calls use typed outputs, validation, transient-error retries,
 provider/model metadata, and source references. Raw private content and
 secrets should not be logged.
+
+Use explicit preferences and consented feedback for personalization.
+Do not perform uncontrolled online training from live runs. Candidate
+prompt/model/fine-tuning changes require offline evaluation against a
+fixed benchmark before release.
+
+## Presentation and chat
+
+Presentation generation returns validated structured data rendered by a
+constrained frontend component system; it must not return executable
+HTML, JavaScript, or CSS. Chat retrieval is restricted to user-selected
+artifact/source attachments, and every answer records the versions used.
 
 ## Persistence
 
