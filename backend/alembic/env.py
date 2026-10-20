@@ -22,8 +22,8 @@ import sys
 # Add src to sys.path so we can import podflow
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
-from podflow.config import get_settings
-from podflow.db.models import Base
+from podflow.core.config import get_settings
+from podflow.persistence.db.models import Base
 
 # add your model's MetaData object here
 # for 'autogenerate' support

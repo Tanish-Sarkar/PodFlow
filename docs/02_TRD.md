@@ -56,23 +56,21 @@ Durable runs    Ingestion/RAG      Presentations, exports,
 ## Backend boundaries
 
 ``` text
-backend/app/
-  api/
-  application/
-  domain/
-  workflow/
-  ingestion/
-  retrieval/
-  llm/
-  integrations/
-  persistence/
-  evaluation/
-  core/
+backend/
+  src/podflow/
+    api/          # FastAPI composition, routes, and HTTP dependencies
+    core/         # configuration and cross-cutting runtime concerns
+    persistence/  # SQLAlchemy models, sessions, and future storage adapters
+  alembic/        # schema history
+  tests/
+    api/
+    unit/
 ```
 
 `domain` must not depend on FastAPI, provider SDKs or UI code. Provider
 SDKs live behind adapters. API schemas are separate from database
-models.
+models. Add `domain`, `application`, and product-specific modules only when
+their first real implementation needs them; they are not placeholder folders.
 
 ## Ingestion
 

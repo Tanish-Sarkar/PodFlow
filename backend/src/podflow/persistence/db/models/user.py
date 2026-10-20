@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from podflow.db.base import Base, TimestampMixin
+from podflow.persistence.db.base import Base, TimestampMixin
 
 
 class UserProfile(Base, TimestampMixin):

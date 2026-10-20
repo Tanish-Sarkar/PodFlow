@@ -14,6 +14,7 @@ dependencies = [
     "sqlalchemy>=2.0.52,<2.1",
     "alembic>=1.20,<1.21",
     "psycopg[binary]>=3.3,<3.4",
+    "pyjwt>=2.8.0,<3",
 ]
 
 [project.optional-dependencies]
@@ -30,9 +31,15 @@ addopts = "-q"
 [tool.ruff]
 line-length = 100
 target-version = "py313"
+extend-exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/env.py" = ["E402"]
+"src/podflow/api/**/*.py" = ["B008"]
+"tests/**/*.py" = ["B008"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

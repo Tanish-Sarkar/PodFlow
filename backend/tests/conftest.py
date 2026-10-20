@@ -1,8 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from podflow.app import create_app
-from podflow.db.session import get_db
+from podflow.api.app import create_app
+from podflow.persistence.db.session import get_db
 
 
 class MockSession:

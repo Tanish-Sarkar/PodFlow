@@ -7,7 +7,6 @@ on:
       - "restructure/**"
       - "feature/**"
       - "fix/**"
-
   pull_request:
     branches:
       - main
@@ -16,19 +15,16 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    name: Validate Repository
+  repository:
+    name: Repository validation
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Validate required files
         shell: bash
         run: |
           set -euo pipefail
-
           required_files=(
             "README.md"
             "LICENSE"
@@ -37,21 +33,20 @@ jobs:
             ".coderabbit.yaml"
             ".github/workflows/ci.yml"
             "docs/README.md"
+            "backend/pyproject.toml"
+            "backend/uv.lock"
+            "frontend/package.json"
+            "frontend/bun.lock"
           )
-
           for file in "${required_files[@]}"; do
-            if [[ ! -f "$file" ]]; then
-              echo "Missing required file: $file"
-              exit 1
-            fi
+            [[ -f "$file" ]] || { echo "Missing required file: $file"; exit 1; }
           done
-
       - name: Validate documentation set
         shell: bash
         run: |
           set -euo pipefail
-
           required_docs=(
+            "00_PodFlow_V2_Master_Specification.md"
             "01_PRD.md"
             "02_TRD.md"
             "03_API_Endpoints.md"
@@ -64,34 +59,70 @@ jobs:
             "10_Deployment_and_CICD.md"
             "11_ADR_and_Missing_Docs.md"
             "12_Repo_Migration_and_Branch_Plan.md"
+            "13_Platform_Monorepo_and_Extension_Architecture.md"
           )
-
           for doc in "${required_docs[@]}"; do
-            if [[ ! -f "docs/$doc" ]]; then
-              echo "Missing required document: docs/$doc"
-              exit 1
-            fi
+            [[ -f "docs/$doc" ]] || { echo "Missing required document: docs/$doc"; exit 1; }
           done
-
       - name: Check for tracked secrets
         shell: bash
         run: |
           set -euo pipefail
-
           tracked_secrets="$(
             git ls-files |
               grep -E '(^|/)\.env(\..*)?$|(^|/)credentials/|(^|/).*credentials\.json$|(^|/).*\.pem$|(^|/).*\.key$|(^|/)token\.json$' |
-              grep -vE '(^|/)\.env\.example$' ||
-              true
+              grep -vE '(^|/)\.env\.example$' || true
           )"
-
           if [[ -n "$tracked_secrets" ]]; then
             echo "Potential secret file detected in Git:"
             printf '%s\n' "$tracked_secrets"
             exit 1
           fi
 
-          echo "No known secret file patterns are tracked."
+  backend:
+    name: Backend checks
+    runs-on: ubuntu-latest
+    needs: repository
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+      - name: Sync locked environment
+        run: uv sync --all-extras --locked
+      - name: Lint
+        run: uv run ruff check .
+      - name: Test
+        run: uv run pytest
+      - name: Validate Alembic revision graph
+        run: uv run alembic -c alembic.ini heads
 
-      - name: Repository validation passed
-        run: echo "PodFlow repository validation passed."
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    needs: repository
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+      - name: Lint
+        run: bun run lint
+      - name: Type check
+        run: bun run typecheck
+      - name: Build
+        run: bun run build
