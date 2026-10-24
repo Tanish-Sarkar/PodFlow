@@ -1,7 +1,8 @@
 # PodFlow V2 — Master Product and Engineering Specification
 
-**Status:** Planning baseline  
-**Purpose:** Single source of truth for the PodFlow V2 product vision, architecture, scope, and delivery plan. Detailed documents in this directory remain supporting specifications until they are consolidated into this one.
+**Status:** Target product and architecture baseline (aspirational; not a claim about current implementation)
+
+**Purpose:** Authoritative reference for intended PodFlow product scope and proposed architecture. For verified code status, test results, and repository risks, use [the dated repository audit](15_Repository_Audit.md). Detailed documents in this directory remain supporting specifications.
 
 ## 1. The product in one paragraph
 

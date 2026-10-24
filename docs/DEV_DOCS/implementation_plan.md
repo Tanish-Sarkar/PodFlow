@@ -1,3 +1,9 @@
+# Historical snapshot — not current instructions
+
+This file records an earlier pre-foundation planning pass. Its statements that the repository has no application, tests, or frontend are now obsolete. Its old “awaiting approval” block is historical and does not govern current work. The credential warning in this snapshot was not re-verified for this audit and must not be treated as evidence that credentials were inspected or are live. Use [the current repository audit](../15_Repository_Audit.md) for verified implementation status and [the engineering backlog](../16_Engineering_Backlog.md) for next steps.
+
+---
+
 # PodFlow Backend Foundation — Architecture Audit & Implementation Plan
 
 ## Phase 0 — Current Repository Understanding
@@ -364,3 +370,5 @@ python -c "from podflow.app import create_app; app = create_app(); print('OK')"
 ## Awaiting Approval
 
 **STOP.** No code will be written until this audit is reviewed and implementation is explicitly authorized.
+
+\n

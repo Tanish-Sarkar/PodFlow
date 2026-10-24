@@ -3,10 +3,11 @@
 Next.js, React, TypeScript, and Tailwind application shell managed with Bun.
 
 ```powershell
-Copy-Item .env.example .env.local
 bun install --frozen-lockfile
 bun run dev
 ```
+
+No frontend environment file is required for local development. Do not copy the repository-root `.env.example` into this directory: it contains server-side configuration and credentials placeholders. Set only browser-safe `NEXT_PUBLIC_*` values here when a specific frontend feature requires them.
 
 Run `bun run lint`, `bun run typecheck`, and `bun run build` before review.
 

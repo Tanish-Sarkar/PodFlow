@@ -2,6 +2,8 @@
 
 > **Status:** Supporting deployment specification. Extend this plan as the PWA, extension, and model-hosting approach are selected.
 
+> **Current state:** `.github/workflows/ci.yml` runs repository/secret checks, backend Ruff/pytest/Alembic validation, and frontend lint/typecheck/build/Playwright checks. No deployment, Docker build, hosted smoke test, or migration-apply job is configured. See [the repository audit](15_Repository_Audit.md) for the exact observed commands and results.
+
 ## Target
 
 ``` text

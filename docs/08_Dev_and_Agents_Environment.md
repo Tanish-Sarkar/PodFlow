@@ -12,13 +12,15 @@ OAuth/Gmail requires it, CodeRabbit.
 
 ## Agent setup
 
-Create:
+The repository already has `.agents/rules/rules_of_code.md` and a root `skills/` catalog. Use those as the current code-writing and task-specific procedure references; do not create a second competing skill directory under `.agents/`.
+
+Future agent work should keep guidance organized as:
 
 ``` text
 .agents/
   rules/
   workflows/
-  skills/
+  skills/ (repository root; see `skills/README.md`)
 ```
 
 Rules cover architecture boundaries, tests, security, migrations,
@@ -56,8 +58,11 @@ Expected output:
 
 ## Branching
 
-`main` is protected. Use `feat/*`, `fix/*`, `chore/*`. One feature per
-PR.
+`main` is the integration target. The current CI push filters include
+`feature/**`, `fix/**`, and `restructure/**`; align branch naming with
+the actual workflow or update both together. Keep one focused change per
+PR. Do not assume `feat/**` or `chore/**` triggers CI until the workflow
+is updated.
 
 ## PR gate
 

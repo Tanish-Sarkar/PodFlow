@@ -2,6 +2,8 @@
 
 > **Status:** Supporting test strategy. Add feature-specific acceptance tests as the API contract is finalized.
 
+> **Current implementation:** Backend tests use pytest and FastAPI `TestClient`; the current public-page browser suite is TypeScript Playwright with axe-core in `frontend/e2e/marketing.spec.ts`. The broader journeys below are planned until product routes exist. Current test results and environment limitations are in [the repository audit](15_Repository_Audit.md).
+
 ## Philosophy
 
 AI output is probabilistic; the surrounding system should be
@@ -35,8 +37,7 @@ explicit confirmation requirements.
 
 ### E2E
 
-Playwright tests for sign-in, source creation, workflow run,
-review/edit, artifact view and share/export.
+Use Playwright for critical end-to-end journeys. The implemented suite currently covers only the public landing page; sign-in, source creation, workflow run, artifact view, and share/export remain future coverage until those features exist. Use the frontend's TypeScript Playwright stack for browser journeys unless the repository later adopts one shared Python browser harness.
 
 Also cover multi-source submission, presentation preview, expired share
 links, recipient-file validation, and chat attachment swap/add/remove.
@@ -78,9 +79,13 @@ by size or reputation alone.
 
 ## CI gates
 
-Ruff/formatting, typecheck, Python tests, integration tests, frontend
-lint/typecheck/build, migration validation, Docker build and secret
-scan.
+Target gates include lint/formatting, typecheck, Python and integration
+tests, frontend lint/typecheck/build, migration validation, deployment
+smoke checks, and secret/dependency scans as the matching tools and
+environments are added. The current workflow does not yet run a Docker
+build, dependency vulnerability scan, real-database integration suite,
+or deployment smoke test; see the [repository audit](15_Repository_Audit.md)
+for the exact configured CI steps.
 
 ## Naming
 

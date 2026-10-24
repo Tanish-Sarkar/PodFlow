@@ -60,9 +60,41 @@ jobs:
             "11_ADR_and_Missing_Docs.md"
             "12_Repo_Migration_and_Branch_Plan.md"
             "13_Platform_Monorepo_and_Extension_Architecture.md"
+            "14_Marketing_Landing_Page_UI_UX_Spec.md"
+            "15_Repository_Audit.md"
+            "16_Engineering_Backlog.md"
+            "17_AI_Agent_Onboarding.md"
+            "18_Backend_Environment_and_Supabase_Setup.md"
           )
           for doc in "${required_docs[@]}"; do
             [[ -f "docs/$doc" ]] || { echo "Missing required document: docs/$doc"; exit 1; }
+          done
+      - name: Validate engineering skills catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+          required_skills=(
+            "skills/README.md"
+            "skills/testing/unit-testing/SKILL.md"
+            "skills/testing/integration-testing/SKILL.md"
+            "skills/testing/functional-testing/SKILL.md"
+            "skills/testing/e2e-testing/SKILL.md"
+            "skills/testing/browser-ui-testing/SKILL.md"
+            "skills/testing/smoke-testing/SKILL.md"
+            "skills/testing/regression-testing/SKILL.md"
+            "skills/testing/api-testing/SKILL.md"
+            "skills/testing/performance-load-testing/SKILL.md"
+            "skills/testing/security-testing/SKILL.md"
+            "skills/testing/accessibility-testing/SKILL.md"
+            "skills/testing/ab-experiment-testing/SKILL.md"
+            "skills/testing/visual-regression-testing/SKILL.md"
+            "skills/testing/ci-cd-quality-gates/SKILL.md"
+            "skills/testing/test-planning-test-data/SKILL.md"
+            "skills/engineering/repository-audit/SKILL.md"
+            "skills/engineering/code-writing-standards/SKILL.md"
+          )
+          for skill in "${required_skills[@]}"; do
+            [[ -f "$skill" ]] || { echo "Missing required skill: $skill"; exit 1; }
           done
       - name: Check for tracked secrets
         shell: bash
