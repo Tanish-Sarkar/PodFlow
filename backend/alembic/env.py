@@ -2,7 +2,7 @@ import asyncio
 from logging.config import fileConfig
 
 from sqlalchemy import pool
-from sqlalchemy.engine import Connection
+from sqlalchemy.engine import Connection, make_url
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
@@ -22,7 +22,7 @@ import sys
 # Add src to sys.path so we can import podflow
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
-from podflow.core.config import get_settings
+from podflow.core.config import get_alembic_settings, get_settings
 from podflow.persistence.db.models import Base
 
 # add your model's MetaData object here
@@ -31,10 +31,12 @@ target_metadata = Base.metadata
 
 # Set sqlalchemy.url from our settings
 settings = get_settings()
-db_url = settings.database_url
+alembic_settings = get_alembic_settings()
+db_url = alembic_settings.database_dsn
 if db_url.startswith("postgresql://"):
     db_url = db_url.replace("postgresql://", "postgresql+psycopg://")
 config.set_main_option("sqlalchemy.url", db_url)
+config.attributes["podflow_runtime_login"] = make_url(settings.database_dsn).username
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -94,6 +96,7 @@ async def run_async_migrations() -> None:
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
     import sys
+
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 

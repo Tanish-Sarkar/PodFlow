@@ -5,7 +5,7 @@ PodFlow is planned as a knowledge workspace that turns collections of sources in
 ## Current repository status
 
 - **Public site:** Next.js landing page with responsive interactions, SEO metadata, and browser/accessibility checks.
-- **Backend foundation:** FastAPI health endpoints, SQLAlchemy session/configuration, profile/workspace tables, migrations, and an authentication dependency scaffold.
+- **Backend foundation:** FastAPI health endpoints, SQLAlchemy session/configuration, the initial owner-scoped knowledge schema and Alembic revision, profile/workspace legacy tables, and an authentication dependency scaffold. The configured remote database has not been migrated.
 - **Not implemented yet:** source ingestion, Knowledge Artifacts, RAG chat, generated presentation pages, expiring share links, exports, newsletter sending, PWA, Chrome extension, and third-party connectors.
 
 The current implementation and verification evidence are tracked in [the repository audit](docs/15_Repository_Audit.md). The intended product and architecture are described separately in [the master specification](docs/00_PodFlow_V2_Master_Specification.md).
@@ -14,7 +14,7 @@ The current implementation and verification evidence are tracked in [the reposit
 
 **Present in code:** Next.js 16 / React / TypeScript / Tailwind / Bun; Python 3.13 / FastAPI / SQLAlchemy / Alembic / `uv`; PostgreSQL configuration; pytest, Ruff, Playwright, and axe-core.
 
-**Planned, not integrated yet:** Supabase Auth/Storage/pgvector, Google OAuth, an open-weight model runtime, workflow orchestration, and deployment services. See the audit before relying on these as existing infrastructure.
+**Planned, not integrated yet:** Supabase Auth and Storage clients, Google OAuth, an open-weight model runtime, workflow orchestration, and deployment services. pgvector support is present in the database schema; the embedding model/dimension and vector index remain undecided. See the [database setup guide](docs/19_Database_Schema_and_Migrations.md) before migrating a database.
 
 ## Local development
 
@@ -23,7 +23,7 @@ Prerequisites: Python 3.13, `uv`, Bun 1.4.2, and Node.js supported by the pinned
 From the repository root, create the backend environment file if needed:
 
 ```powershell
-Copy-Item .env.example .env
+Copy-Item backend/.env.example backend/.env
 ```
 
 Use local placeholder values only; do not put server secrets in a frontend env file. The frontend needs no env file for local development. `NEXT_PUBLIC_SITE_URL` is optional locally and must be set to the real canonical origin for production builds.

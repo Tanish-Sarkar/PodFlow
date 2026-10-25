@@ -15,6 +15,7 @@ This repository distinguishes the intended product from the current implementati
 | Prioritized next work | [16 — Engineering backlog](16_Engineering_Backlog.md) | Dependencies, effort bands, impact, and acceptance criteria. |
 | New developer/agent starting point | [17 — AI agent onboarding](17_AI_Agent_Onboarding.md) | What to read and how to make a verified change. |
 | Backend environment and Supabase setup | [18 — Backend environment setup](18_Backend_Environment_and_Supabase_Setup.md) | Phase 1 environment-only configuration. No schema/routes. |
+| Database schema, ownership and migration workflow | [19 — Database schema and migrations](19_Database_Schema_and_Migrations.md) | Current ORM schema and incremental migration, with embedding/RLS target caveats. |
 | Development procedures | [Skills index](../skills/README.md) and `.agents/rules/rules_of_code.md` | Reusable testing and engineering instructions. |
 
 If a code path, migration, command result, and planning statement disagree about what exists, use the code and reproducible command result, then update the docs. Do not silently rewrite a target requirement into an implemented feature.
@@ -36,6 +37,7 @@ If a code path, migration, command result, and planning statement disagree about
 13. [13 — Platform, monorepo, and extension architecture](13_Platform_Monorepo_and_Extension_Architecture.md)
 14. [14 — Marketing landing-page UI/UX specification](14_Marketing_Landing_Page_UI_UX_Spec.md)
 15. [18 — Backend environment and Supabase setup](18_Backend_Environment_and_Supabase_Setup.md)
+16. [19 — Database schema and migrations](19_Database_Schema_and_Migrations.md)
 
 ## Current component shape
 
