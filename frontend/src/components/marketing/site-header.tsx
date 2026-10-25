@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MobileNav } from "./mobile-nav";
 import { PodFlowMark } from "./icons";
 
@@ -32,10 +33,21 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <div className="flex items-center gap-2">
-          <a href="#artifact" className="btn btn-primary hidden sm:inline-flex">
-            Preview an artifact
-          </a>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/login"
+            id="header-sign-in"
+            className="link-quiet hidden text-sm font-medium sm:inline-flex px-2 py-1.5 hover:text-ink"
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/dashboard"
+            id="header-dashboard-cta"
+            className="btn btn-primary hidden sm:inline-flex"
+          >
+            Dashboard
+          </Link>
           <MobileNav links={NAV_LINKS} />
         </div>
       </div>

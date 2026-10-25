@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HeroPreview } from "./hero-preview";
 import { ArrowRightIcon } from "./icons";
 
@@ -9,13 +10,19 @@ export function Hero() {
       <div aria-hidden="true" className="bg-dots pointer-events-none absolute inset-0 opacity-70" />
       <div className="relative mx-auto grid w-full max-w-[1200px] gap-12 px-4 pt-12 pb-16 sm:px-6 sm:pt-16 sm:pb-20 lg:px-8 xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] xl:items-center xl:gap-14 xl:pt-20 xl:pb-24">
         <div className="max-w-xl xl:max-w-none">
-          <p
-            className="rise inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-primary-hover"
-            style={rise(0)}
-          >
-            <span aria-hidden="true" className="h-px w-6 bg-primary" />A workspace for connected
-            knowledge
-          </p>
+          <div className="rise flex flex-wrap items-center gap-2.5" style={rise(0)}>
+            <p className="inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-primary-hover">
+              <span aria-hidden="true" className="h-px w-6 bg-primary" />A workspace for connected
+              knowledge
+            </p>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-800 transition-colors hover:bg-amber-100"
+            >
+              <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+              Dev Preview Live &rarr;
+            </Link>
+          </div>
           <h1
             id="hero-heading"
             className="rise mt-5 text-[2.5rem] leading-[1.05] font-semibold tracking-[-0.03em] text-balance text-ink sm:text-5xl xl:text-[3.5rem]"
@@ -34,9 +41,12 @@ export function Hero() {
             className="rise mt-8 flex flex-col gap-3 sm:flex-row"
             style={rise(3)}
           >
-            <a href="#how-it-works" className="btn btn-primary">
-              Explore the workflow
+            <Link href="/dashboard" className="btn btn-primary">
+              Open Dashboard
               <ArrowRightIcon className="size-4" />
+            </Link>
+            <a href="#how-it-works" className="btn btn-secondary">
+              Explore the workflow
             </a>
             <a href="#artifact" className="btn btn-secondary">
               Preview an artifact

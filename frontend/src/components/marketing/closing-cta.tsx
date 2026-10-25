@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRightIcon } from "./icons";
 import { Container } from "./section";
 
@@ -13,16 +14,19 @@ export function ClosingCta() {
             See what a source-linked workspace feels like.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg sm:leading-relaxed">
-            PodFlow is still being built and there is no sign-up yet. In the meantime, the previews
-            on this page are the best view of how it is planned to work.
+            PodFlow is actively in development. Explore the interactive previews below or launch
+            the developer dashboard prototype right now.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <a href="#artifact" className="btn btn-primary">
-              Preview an artifact
+            <Link href="/dashboard" className="btn btn-primary">
+              Open Dashboard Preview
               <ArrowRightIcon className="size-4" />
-            </a>
-            <a href="#chat" className="btn btn-secondary">
-              Try the scoped chat
+            </Link>
+            <Link href="/login" className="btn btn-secondary">
+              Sign in
+            </Link>
+            <a href="#artifact" className="btn btn-secondary">
+              Preview an artifact
             </a>
           </div>
         </div>

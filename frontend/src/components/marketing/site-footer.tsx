@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PodFlowMark } from "./icons";
 import { Container } from "./section";
 import { NAV_LINKS } from "./site-header";
@@ -35,9 +36,14 @@ export function SiteFooter() {
               </a>
             </li>
             <li>
-              <a href="#connect" className="link-quiet inline-flex min-h-9 items-center">
-                Connectors
-              </a>
+              <Link href="/login" className="link-quiet inline-flex min-h-9 items-center">
+                Sign in
+              </Link>
+            </li>
+            <li>
+              <Link href="/dashboard" className="link-quiet inline-flex min-h-9 items-center text-primary font-semibold">
+                Dashboard
+              </Link>
             </li>
           </ul>
         </nav>

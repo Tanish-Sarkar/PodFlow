@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import Link from "next/link";
 import { CloseIcon, MenuIcon } from "./icons";
 
 type NavLink = { href: string; label: string };
@@ -54,14 +55,32 @@ export function MobileNav({ links }: { links: readonly NavLink[] }) {
               </a>
             </li>
           ))}
+          <li className="border-t border-line my-1 pt-1">
+            <Link
+              href="/login"
+              onClick={() => setOpen(false)}
+              className="flex min-h-11 items-center text-base font-medium text-ink transition-colors hover:text-primary-hover"
+            >
+              Sign in
+            </Link>
+          </li>
         </ul>
-        <a
-          href="#artifact"
-          onClick={() => setOpen(false)}
-          className="btn btn-primary mt-2 mb-1 w-full sm:hidden"
-        >
-          Preview an artifact
-        </a>
+        <div className="mt-2 flex flex-col gap-2">
+          <Link
+            href="/dashboard"
+            onClick={() => setOpen(false)}
+            className="btn btn-primary w-full text-center"
+          >
+            Go to Dashboard
+          </Link>
+          <a
+            href="#artifact"
+            onClick={() => setOpen(false)}
+            className="btn btn-secondary w-full text-center sm:hidden"
+          >
+            Preview an artifact
+          </a>
+        </div>
       </nav>
     </div>
   );
