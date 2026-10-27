@@ -23,6 +23,9 @@ import {
   AlertIcon,
 } from "./icons";
 import { cn } from "@/lib/utils";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("DashboardOverview");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -107,14 +110,28 @@ function ResourceEntryPanel({
       .map((l) => l.trim())
       .filter(Boolean);
 
-    if (!lines.length) return;
+    log.info("Resource entry form submitted", { lineCount: lines.length });
+
+    if (!lines.length) {
+      log.debug("Resource submit ignored: textarea was empty");
+      return;
+    }
 
     const invalid = lines.filter((l) => !isValidUrl(l));
     if (invalid.length) {
+      log.warn("Resource submission has invalid URLs", {
+        invalidUrls: invalid,
+        validCount: lines.length - invalid.length,
+        invalidCount: invalid.length,
+      });
       setErrors(invalid);
       return;
     }
 
+    log.info("All URLs valid, adding resources to workspace", {
+      urls: lines,
+      count: lines.length,
+    });
     setErrors([]);
     onAdd(lines);
     setValue("");
@@ -445,12 +462,22 @@ function IntegrationsSection() {
 export function DashboardOverview({ displayName }: { displayName: string }) {
   const [sessionResources, setSessionResources] = useState<EnteredResource[]>([]);
 
+  log.debug("DashboardOverview render", {
+    displayName,
+    sessionResourceCount: sessionResources.length,
+  });
+
   function handleAdd(urls: string[]) {
     const newResources: EnteredResource[] = urls.map((url) => ({
       id: `session-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       url,
       status: "added",
     }));
+    log.info("Session resources updated", {
+      newCount: newResources.length,
+      totalAfter: sessionResources.length + newResources.length,
+      urls,
+    });
     setSessionResources((prev) => [...prev, ...newResources]);
   }
 

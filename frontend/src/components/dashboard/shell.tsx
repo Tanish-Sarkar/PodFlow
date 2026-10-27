@@ -17,6 +17,9 @@ import {
   CloseIcon,
 } from "./icons";
 import { cn } from "@/lib/utils";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("DashboardShell");
 
 // ---------------------------------------------------------------------------
 // Nav items
@@ -74,7 +77,10 @@ function NavLink({
   return (
     <Link
       href={href}
-      onClick={onClick}
+      onClick={() => {
+        log.info("Nav link clicked", { href, label });
+        onClick?.();
+      }}
       className={cn(
         "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] font-medium transition-colors duration-150",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary",
@@ -245,7 +251,17 @@ export function DashboardShell({
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const closeMobile = useCallback(() => setMobileOpen(false), []);
+  log.debug("DashboardShell render", { pathname, mobileOpen, displayName: session.displayName });
+
+  const closeMobile = useCallback(() => {
+    log.debug("Mobile drawer closing");
+    setMobileOpen(false);
+  }, []);
+
+  function openMobile() {
+    log.info("Mobile navigation drawer opened");
+    setMobileOpen(true);
+  }
 
   return (
     <div className="flex min-h-screen bg-paper">
@@ -302,7 +318,7 @@ export function DashboardShell({
       {/* ---------------------------------------------------------------- */}
       <div className="flex flex-1 flex-col min-w-0">
         {/* Mobile top bar */}
-        <TopBar onMenuOpen={() => setMobileOpen(true)} />
+        <TopBar onMenuOpen={openMobile} />
 
         {/* Page content */}
         <main id="dashboard-main" className="flex-1 overflow-auto">

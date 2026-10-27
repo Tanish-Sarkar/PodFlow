@@ -10,6 +10,9 @@ import {
   writeDevSession,
   MOCK_DEV_SESSION,
 } from "@/lib/dev-session";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("LoginPage");
 
 // ---------------------------------------------------------------------------
 // Google-branded icon (inline SVG — no extra dependency)
@@ -44,16 +47,27 @@ export default function LoginPage() {
   const router = useRouter();
   const [isActivating, setIsActivating] = useState(false);
 
+  log.debug("LoginPage render", { isActivating, isDevEnv: isDevEnvironment() });
+
   // Redirect to dashboard if a dev session already exists (e.g. back-navigation)
   useEffect(() => {
-    if (readDevSession()) {
+    log.info("LoginPage mounted — checking for existing dev session");
+    const session = readDevSession();
+    if (session) {
+      log.info("Existing dev session detected, redirecting to /dashboard", {
+        displayName: session.displayName,
+      });
       router.replace("/dashboard");
+    } else {
+      log.debug("No existing session — showing login form");
     }
   }, [router]);
 
   function handleDevLogin() {
+    log.info("Developer preview login initiated");
     setIsActivating(true);
     writeDevSession(MOCK_DEV_SESSION);
+    log.info("Mock session written, navigating to /dashboard");
     router.push("/dashboard");
   }
 
