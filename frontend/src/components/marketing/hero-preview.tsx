@@ -68,7 +68,7 @@ export function HeroPreview() {
                   tabIndex={selected ? 0 : -1}
                   onClick={() => setTab(id)}
                   onKeyDown={(event) => onTabKeyDown(event, index)}
-                  className={`inline-flex min-h-8 items-center gap-1.5 rounded-md px-3 text-[13px] font-medium transition-colors ${
+                  className={`inline-flex min-h-8 items-center gap-1.5 rounded-md px-3 text-sm font-medium transition-colors duration-300 ${
                     selected
                       ? "bg-ink text-white"
                       : "text-body hover:bg-tint hover:text-primary-hover"
@@ -184,7 +184,7 @@ export function HeroPreview() {
                 </p>
                 <ul className="m-0 mt-3 flex list-none flex-wrap items-center gap-x-4 gap-y-1.5 p-0 text-xs font-medium text-body">
                   <li className="text-xs font-semibold tracking-wide text-muted uppercase">
-                    Then use it as
+                    Planned uses
                   </li>
                   <li className="inline-flex items-center gap-1.5">
                     <PresentationIcon className="size-4 text-primary" /> Presentation
@@ -208,7 +208,7 @@ export function HeroPreview() {
               className={`flex-1 flex-col p-4 sm:p-5 ${tab === "ask" ? "tab-panel-enter flex" : ""}`}
             >
               <p className="text-xs font-semibold tracking-wide text-muted uppercase">
-                Chat scope
+                Planned chat concept
               </p>
               <p className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-line bg-paper px-2.5 py-1 text-xs font-medium text-ink">
                 <LinkNodesIcon className="size-3.5 text-primary" />
@@ -230,8 +230,8 @@ export function HeroPreview() {
                 </p>
               </div>
               <p className="mt-auto border-t border-line pt-3 text-xs text-muted">
-                Answers draw only on the attached knowledge. If the evidence is not there, the chat
-                says so.
+                Intended to keep questions within the selected context and make missing evidence
+                visible.
               </p>
             </div>
           </div>

@@ -10,10 +10,10 @@
 
 export const SITE_NAME = "PodFlow";
 
-export const SITE_TITLE = "PodFlow: a knowledge workspace for evidence-linked research";
+export const SITE_TITLE = "PodFlow | A focused research workspace";
 
 export const SITE_DESCRIPTION =
-  "Bring videos, articles and documents together into an evidence-linked Knowledge Artifact. Present it, ask cited questions, and export it.";
+  "PodFlow is a planned research workspace for analysts, writers, and teams, turning selected sources into concise, cited knowledge and reusable memory clips.";
 
 function parseSiteUrl(raw: string | undefined): URL | null {
   const value = raw?.trim();

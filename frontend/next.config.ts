@@ -25,6 +25,16 @@ function vitalsOrigin(): string | null {
   }
 }
 
+/** Origin of the optional early access endpoint configured for the marketing form. */
+function waitlistOrigin(): string | null {
+  try {
+    const raw = process.env.NEXT_PUBLIC_WAITLIST_ENDPOINT;
+    return raw ? new URL(raw).origin : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Content-Security-Policy without nonces (the page is statically prerendered, so a
  * per-request nonce is not available). Next.js's own bootstrap scripts and React's
@@ -32,7 +42,7 @@ function vitalsOrigin(): string | null {
  * When the authenticated app and API calls arrive, extend `connect-src` with the
  * API and Supabase origins deliberately rather than loosening the policy.
  */
-const connectSources = ["'self'", vitalsOrigin()].filter(Boolean).join(" ");
+const connectSources = ["'self'", vitalsOrigin(), waitlistOrigin()].filter(Boolean).join(" ");
 
 const contentSecurityPolicy = [
   "default-src 'self'",

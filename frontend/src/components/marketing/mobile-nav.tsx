@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import Link from "next/link";
 import { CloseIcon, MenuIcon } from "./icons";
 
 type NavLink = { href: string; label: string };
@@ -25,14 +24,14 @@ export function MobileNav({ links }: { links: readonly NavLink[] }) {
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         ref={buttonRef}
         type="button"
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex size-11 items-center justify-center rounded-lg border border-line bg-surface text-ink transition-colors hover:border-primary hover:text-primary-hover"
+        className="inline-flex size-11 items-center justify-center rounded-lg border border-line bg-surface text-ink transition-colors duration-300 hover:border-primary hover:text-primary-hover"
       >
         {open ? <CloseIcon /> : <MenuIcon />}
         <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
@@ -41,7 +40,7 @@ export function MobileNav({ links }: { links: readonly NavLink[] }) {
         id={panelId}
         aria-label="Primary"
         hidden={!open}
-        className="absolute inset-x-0 top-full border-b border-line bg-paper px-4 py-3 shadow-card"
+        className="fixed inset-x-0 bottom-0 top-20 z-40 overflow-y-auto border-t border-line bg-paper/95 px-6 py-8 backdrop-blur"
       >
         <ul className="m-0 flex list-none flex-col p-0">
           {links.map((link) => (
@@ -49,36 +48,20 @@ export function MobileNav({ links }: { links: readonly NavLink[] }) {
               <a
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="flex min-h-11 items-center text-base font-medium text-ink transition-colors hover:text-primary-hover"
+                className="flex min-h-12 items-center text-xl font-medium text-ink transition-colors duration-300 hover:text-primary-hover"
               >
                 {link.label}
               </a>
             </li>
           ))}
-          <li className="border-t border-line my-1 pt-1">
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="flex min-h-11 items-center text-base font-medium text-ink transition-colors hover:text-primary-hover"
-            >
-              Sign in
-            </Link>
-          </li>
         </ul>
-        <div className="mt-2 flex flex-col gap-2">
-          <Link
-            href="/dashboard"
+        <div className="mt-8 flex flex-col gap-4">
+          <a
+            href="#waitlist"
             onClick={() => setOpen(false)}
             className="btn btn-primary w-full text-center"
           >
-            Go to Dashboard
-          </Link>
-          <a
-            href="#artifact"
-            onClick={() => setOpen(false)}
-            className="btn btn-secondary w-full text-center sm:hidden"
-          >
-            Preview an artifact
+            Get early access
           </a>
         </div>
       </nav>

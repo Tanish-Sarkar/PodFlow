@@ -84,23 +84,28 @@ body {
     justify-content: center;
     gap: 0.5rem;
     min-height: 2.75rem;
-    padding: 0 1.125rem;
+    padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
     border: 1px solid transparent;
-    font-size: 0.9375rem;
-    font-weight: 550;
-    line-height: 1;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
     white-space: nowrap;
     transition:
-      background-color 160ms ease,
-      border-color 160ms ease,
-      color 160ms ease,
-      transform 160ms ease,
-      box-shadow 160ms ease;
+      background-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .btn:active {
     transform: translateY(1px);
+  }
+
+  .btn:disabled {
+    cursor: wait;
+    opacity: 0.72;
   }
 
   .btn-primary {
@@ -145,11 +150,76 @@ body {
 
   .link-quiet {
     color: var(--color-body);
-    transition: color 160ms ease;
+    transition: color 300ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .link-quiet:hover {
     color: var(--color-primary-hover);
+  }
+}
+
+@layer components {
+  .heading-1 {
+    @apply text-5xl leading-none font-semibold tracking-tight sm:text-6xl;
+  }
+
+  .hero-heading {
+    background-image: linear-gradient(90deg, #000000, #666666);
+    background-clip: text;
+    color: transparent;
+  }
+
+  .heading-2 {
+    @apply text-4xl leading-none font-semibold tracking-tight sm:text-5xl;
+  }
+
+  .heading-3 {
+    @apply text-3xl leading-tight font-semibold tracking-tight sm:text-4xl;
+  }
+
+  .heading-5 {
+    @apply text-2xl leading-8 font-semibold tracking-tight;
+  }
+
+  .title-2 {
+    @apply text-lg leading-7 font-medium;
+  }
+
+  .body-3 {
+    @apply text-base leading-6 font-normal text-pretty;
+  }
+
+  .body-5 {
+    @apply text-base leading-6 font-medium;
+  }
+
+  .body-6 {
+    @apply text-sm leading-5 font-normal text-pretty;
+  }
+
+  .caption-2 {
+    @apply text-sm leading-5 font-normal;
+  }
+
+  .caption-3 {
+    @apply text-xs leading-4 font-semibold tracking-wide;
+  }
+
+  .caption-4 {
+    @apply text-xs leading-4 font-normal;
+  }
+
+  .eyebrow {
+    @apply text-sm leading-5 font-semibold tracking-wide text-primary-hover;
+  }
+
+  .tagline-reveal [data-tagline-word] {
+    opacity: 1;
+    transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .tagline-reveal[data-observed="true"] [data-tagline-word]:not([data-revealed="true"]) {
+    opacity: 0.3;
   }
 }
 
@@ -180,10 +250,10 @@ body {
   font-weight: 650;
   line-height: 1;
   transition:
-    background-color 140ms ease,
-    border-color 140ms ease,
-    color 140ms ease,
-    transform 140ms ease;
+    background-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .cite-marker:hover,
@@ -203,9 +273,9 @@ body {
 
 [data-evidence] {
   transition:
-    border-color 160ms ease,
-    background-color 160ms ease,
-    box-shadow 160ms ease;
+    border-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 [data-evidence][data-active="true"] {
@@ -222,7 +292,7 @@ body {
 
 [data-claim] {
   border-radius: 0.375rem;
-  transition: background-color 160ms ease;
+  transition: background-color 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 [data-claim][data-active="true"] {
@@ -276,7 +346,7 @@ body {
 
 @media (prefers-reduced-motion: no-preference) {
   .rise {
-    animation: rise 560ms cubic-bezier(0.22, 0.7, 0.2, 1) both;
+    animation: rise 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: calc(var(--rise-i, 0) * 70ms);
   }
 
@@ -290,12 +360,12 @@ body {
    */
   @media (min-width: 80rem) {
     .flow-card {
-      animation: flow-in 560ms cubic-bezier(0.22, 0.7, 0.2, 1) both;
+      animation: flow-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
       animation-delay: calc(120ms + var(--flow-i, 0) * 120ms);
     }
 
     .flow-path {
-      animation: flow-fade 700ms ease-out both;
+      animation: flow-fade 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
       animation-delay: calc(360ms + var(--flow-i, 0) * 120ms);
     }
   }
@@ -303,7 +373,7 @@ body {
   @media (max-width: 79.99rem) {
     @supports (animation-timeline: view()) {
       .flow-card {
-        animation: flow-in linear both;
+        animation: flow-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
         animation-timeline: view();
         animation-range: entry 0% entry 90%;
       }
@@ -311,7 +381,7 @@ body {
   }
 
   .tab-panel-enter {
-    animation: settle 220ms ease-out both;
+    animation: settle 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
 }

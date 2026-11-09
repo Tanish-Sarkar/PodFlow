@@ -69,73 +69,29 @@ test.describe("keyboard and assistive technology", () => {
     expect(levels.filter((l) => l > 3)).toEqual([]);
   });
 
-  test("use-case tabs work with the keyboard and expose one panel", async ({ page }) => {
+  test("use cases are presented as examples rather than customer claims", async ({ page }) => {
     await page.goto("/");
-    const tablist = page.getByRole("tablist", { name: "Use cases" });
-    await tablist.scrollIntoViewIfNeeded();
-    const tabs = tablist.getByRole("tab");
-    await tabs.first().focus();
-    await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
-
-    await page.keyboard.press("ArrowRight");
-    await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
-    await expect(tabs.nth(1)).toBeFocused();
-
-    await page.keyboard.press("End");
-    await expect(tabs.last()).toHaveAttribute("aria-selected", "true");
-    await page.keyboard.press("Home");
-    await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
-
-    // Only the active card is in the accessibility tree.
-    await expect(page.locator('#use-cases [role="tabpanel"]:not([aria-hidden])')).toHaveCount(1);
-    // Selected tab announces its panel.
-    const controls = await tabs.first().getAttribute("aria-controls");
-    await expect(page.locator(`[id="${controls}"]`)).not.toHaveAttribute("aria-hidden", "true");
+    const section = page.locator("#use-cases");
+    await section.scrollIntoViewIfNeeded();
+    await expect(section.getByRole("heading", { level: 3 })).toHaveCount(4);
+    await expect(section).toContainText("not customer stories");
   });
 
-  test("citation markers: keyboard focus previews, Enter pins", async ({ page }) => {
+  test("the artifact concept explains source references", async ({ page }) => {
     await page.goto("/");
     const section = page.locator("#artifact");
     await section.scrollIntoViewIfNeeded();
-    const marker = section.getByRole("button", { name: /^Source 2:/ }).first();
-    const card = section.locator('[data-evidence][data-active]').nth(1);
-
-    await page.keyboard.press("Tab"); // ensure keyboard modality for :focus-visible
-    await marker.focus();
-    await expect(card).toHaveAttribute("data-active", "true");
-    await expect(marker).toHaveAttribute("aria-pressed", "false");
-
-    await page.keyboard.press("Enter");
-    await expect(marker).toHaveAttribute("aria-pressed", "true");
-
-    await page.getByRole("link", { name: "Skip to content" }).focus(); // blur the marker
-    await expect(card).toHaveAttribute("data-active", "true"); // still pinned
-    await marker.focus();
-    await page.keyboard.press("Space");
-    await expect(marker).toHaveAttribute("aria-pressed", "false");
+    await expect(section.getByRole("heading", { level: 2 })).toContainText("Knowledge Artifact");
+    await expect(section).toContainText("Source reference");
+    await expect(section).toContainText("not available yet");
   });
 
-  test("citation markers: mouse hover previews", async ({ page }) => {
+  test("memory clips are described as a planned concept", async ({ page }) => {
     await page.goto("/");
-    const section = page.locator("#artifact");
-    await section.scrollIntoViewIfNeeded();
-    const marker = section.getByRole("button", { name: /^Source 3:/ }).first();
-    const card = section.locator("[data-evidence][data-active]").nth(2);
-    await marker.hover();
-    await expect(card).toHaveAttribute("data-active", "true");
-    await page.mouse.move(5, 5);
-    await expect(card).toHaveAttribute("data-active", "false");
-  });
-
-  test("scoped chat chips toggle scope and change the answer", async ({ page }) => {
-    await page.goto("/");
-    const chat = page.getByRole("region", { name: "Scoped chat preview" });
-    await chat.scrollIntoViewIfNeeded();
-    const answer = chat.locator("[aria-live]");
-    await chat.getByRole("button", { name: /Onboarding notes/ }).click();
-    await expect(answer).toContainText("does not establish an answer");
-    await chat.getByRole("button", { name: /Team handoffs/ }).click();
-    await expect(answer).toContainText("No knowledge is attached");
+    const clips = page.locator("#memory-clips");
+    await clips.scrollIntoViewIfNeeded();
+    await expect(clips.getByText("PLANNED CONCEPT")).toBeVisible();
+    await expect(clips).toContainText("Memory clips are not available yet");
   });
 });
 
@@ -164,20 +120,12 @@ test.describe("mobile menu", () => {
 test.describe("touch", () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
-  test("a tap pins a citation and a second tap clears it", async ({ page }) => {
+  test("the waitlist does not imply that signup is live", async ({ page }) => {
     await page.goto("/");
-    const section = page.locator("#artifact");
-    await section.scrollIntoViewIfNeeded();
-    const marker = section.getByRole("button", { name: /^Source 2:/ }).first();
-    const card = section.locator("[data-evidence][data-active]").nth(1);
-
-    await marker.tap();
-    await expect(marker).toHaveAttribute("aria-pressed", "true");
-    await expect(card).toHaveAttribute("data-active", "true");
-
-    await marker.tap();
-    await expect(marker).toHaveAttribute("aria-pressed", "false");
-    await expect(card).toHaveAttribute("data-active", "false");
+    const waitlist = page.locator("#waitlist");
+    await waitlist.scrollIntoViewIfNeeded();
+    await expect(waitlist).toContainText("No email is collected on this page today");
+    await expect(waitlist.getByRole("button", { name: /Join the early access list/ })).toHaveCount(0);
   });
 });
 
@@ -197,19 +145,19 @@ test.describe("motion preferences", () => {
     const styles = await page.evaluate(() => {
       const h1 = document.querySelector("h1")!;
       const card = document.querySelector(".flow-card")!;
-      const tabCard = document.querySelector(".tab-card")!;
+      const taglineWord = document.querySelector(".tagline-reveal [data-tagline-word]")!;
       return {
         h1Animation: getComputedStyle(h1).animationName,
         cardAnimation: getComputedStyle(card).animationName,
         cardOpacity: getComputedStyle(card).opacity,
-        tabTransition: parseFloat(getComputedStyle(tabCard).transitionDuration),
+        taglineTransition: parseFloat(getComputedStyle(taglineWord).transitionDuration),
         running: document.getAnimations().filter((a) => a.playState === "running").length,
       };
     });
     expect(styles.h1Animation).toBe("none");
     expect(styles.cardAnimation).toBe("none");
     expect(styles.cardOpacity).toBe("1");
-    expect(styles.tabTransition).toBeLessThan(0.001);
+    expect(styles.taglineTransition).toBeLessThan(0.001);
     expect(styles.running).toBe(0);
   });
 });
@@ -217,19 +165,15 @@ test.describe("motion preferences", () => {
 test.describe("server-rendered content", () => {
   test.use({ javaScriptEnabled: false, viewport: { width: 1280, height: 900 } });
 
-  test("hero sources and connector copy are visible without JavaScript", async ({ page }) => {
+  test("the product flow and roadmap are visible without JavaScript", async ({ page }) => {
     await page.goto("/");
     await page.waitForTimeout(1500); // let the CSS entrance finish
     const firstCard = page.locator(".flow-card").first();
     await expect(firstCard).toBeVisible();
     expect(await firstCard.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
 
-    const connect = page.locator("#connect");
-    await expect(connect.getByRole("heading", { level: 2 })).toContainText("Planned");
-    await expect(connect).toContainText("None are available yet");
-    // The destination cards are static HTML, not a click-to-expand widget.
-    await expect(connect.getByRole("heading", { level: 3 })).toHaveCount(4);
-    await expect(connect.locator("[aria-expanded]")).toHaveCount(0);
+    await expect(page.locator("#workflow")).toContainText("not available in the current prototype");
+    await expect(page.locator("#later")).toContainText("None of these capabilities are available today");
   });
 });
 
@@ -243,7 +187,7 @@ test.describe("SEO, metadata and hardening", () => {
     expect(response?.status()).toBe(200);
 
     await expect(page).toHaveTitle(/PodFlow/);
-    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /evidence-linked/);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /cited knowledge/);
     await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
     await expect(page.locator('link[rel="icon"]')).toHaveCount(1);
@@ -258,10 +202,10 @@ test.describe("SEO, metadata and hardening", () => {
     // Footer must not carry a build note.
     await expect(page.locator("footer")).not.toContainText("will appear here");
 
-    // Raw HTML (what a crawler sees) contains the honest connector copy.
+    // Raw HTML (what a crawler sees) contains the honest product status.
     const html = await (await request.get("/")).text();
-    expect(html).toContain("None are available yet");
-    expect(html).toContain("Planned: send what you know to");
+    expect(html).toContain("Memory clips are not available yet");
+    expect(html).toContain("not available today");
 
     expect(consoleErrors, "console errors (includes CSP violations)").toEqual([]);
   });

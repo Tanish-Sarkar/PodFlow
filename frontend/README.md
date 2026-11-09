@@ -15,6 +15,15 @@ Only `NEXT_PUBLIC_*` values are available to browser code. Do not put Supabase
 service-role keys, database URLs, JWT-signing secrets, OAuth client secrets, or
 model-provider keys in `.env.local`.
 
+### Early access signups
+
+The marketing page displays an unavailable state and collects no addresses until
+`NEXT_PUBLIC_WAITLIST_ENDPOINT` is set. Configure it only after signup and data
+handling details are ready to publish. The endpoint must accept a browser `POST`
+with a JSON body containing `email`, allow requests from the deployed site origin
+with CORS, and return a successful HTTP status when the request is accepted. Its
+origin is added to the production Content Security Policy `connect-src` directive.
+
 ## Public marketing page
 
 `/` is the public marketing page (spec: `docs/14_Marketing_Landing_Page_UI_UX_Spec.md`).
@@ -54,7 +63,7 @@ bun run test:e2e                   # runs against `next start`; build first
 ```
 
 `test:e2e` covers horizontal overflow at 375/768/1280px, axe WCAG A/AA, the skip link,
-mobile menu / tabs / citation-marker keyboard operation, touch behaviour,
+mobile navigation, honest product-status and waitlist messaging, example use cases,
 `prefers-reduced-motion`, no-JavaScript visibility, metadata/JSON-LD and security
 headers. If Playwright's Chromium is not installed, use an installed browser:
 `$env:PW_CHANNEL="msedge"; bun run test:e2e`.
