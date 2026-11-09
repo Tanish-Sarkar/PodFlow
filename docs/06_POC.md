@@ -1,14 +1,17 @@
 # PodFlow --- Proof of Concept
 
+> **Status:** Core-risk POC. It precedes full presentation, export, email, extension, and connector work.
+
 ## Objective
 
 Prove the technically risky core before building the complete product.
 
 Questions: 1. Can YouTube, web and PDF content be ingested reliably? 2.
-Can sources be normalized? 3. Does pgvector retrieval return useful
-evidence? 4. Can structured generation stay grounded in retrieved
-context? 5. Can citations survive the pipeline? 6. Is quality good
-enough to justify the architecture?
+Can multiple sources be normalized into one run? 3. Does pgvector
+retrieval return useful evidence? 4. Can structured generation stay
+grounded in retrieved context using the selected open-weight model? 5.
+Can citations survive the pipeline? 6. Is quality good enough to justify
+the architecture?
 
 ## Flow
 
@@ -36,9 +39,10 @@ Citation-aware viewer
 
 ## Scope
 
-One YouTube source, one web page, one PDF, one embedding model,
-pgvector, top-k retrieval, one structured generation path and
-citation-aware artifact output.
+One YouTube source, one web page, one PDF, one multi-source run, one
+embedding model, pgvector, top-k retrieval, one structured generation
+path, citation-aware artifact output, and a minimal cited question-answer
+flow over a selected artifact.
 
 ## Evaluation dataset
 

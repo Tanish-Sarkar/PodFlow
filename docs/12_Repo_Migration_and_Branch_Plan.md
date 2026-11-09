@@ -1,4 +1,6 @@
-# PodFlow --- Repository Migration and Branch Plan
+# PodFlow --- Historical Repository Migration and Branch Plan
+
+> **Status: Historical.** This records the original repository-reset proposal. It is not the active branch procedure and must not be followed without a fresh repository/branch audit. The current structural decision is in `00_PodFlow_V2_Master_Specification.md`.
 
 ## Decision
 
