@@ -1,63 +1,48 @@
-# PodFlow --- Phase-wise Milestones
+# PodFlow — Phase-wise Milestones
 
-Estimates assume one strong developer using AI agents with human review.
+> **Status:** Current. The project target is 6–8 weeks with AI-assisted system design and development. Phase estimates should be set after the codebase audit and first POC; the target is a planning goal, not a guarantee that every future connector and polish item fits.
 
-## Phase 0 --- Repository reset: 1--2 days
+## Phase 0 — Audit and documentation
 
-Tag legacy state, create restructuring branch, clean obsolete branches
-after verification, establish structure, docs, rules and CI.
+Inventory the current implementation, reconcile documents, finalize the
+first domain/API contracts, and record what is implemented versus planned.
 
-## Phase 1 --- Foundation: 3--5 days
+## Phase 1 — Foundation and source pipeline
 
-FastAPI, Next.js, Supabase, SQLAlchemy, Alembic, auth, ownership model
-and health endpoints.
+Authentication, ownership, migrations, durable runs, YouTube/web/PDF
+ingestion, normalization, chunks, embeddings, pgvector, and retrieval
+evaluation.
 
-## Phase 2 --- Ingestion: 4--7 days
+## Phase 2 — Artifacts and exports
 
-YouTube, URL, PDF/document adapters, normalization, storage, chunking
-and ingestion status/jobs.
+Automatic artifact generation, evidence/citations, versions, artifact
+viewer, and Markdown/JSON/DOCX/PDF exports.
 
-## Phase 3 --- RAG: 4--7 days
+## Phase 3 — Presentation, sharing, and email
 
-Embeddings, pgvector, retrieval API, metadata filters, retrieval
-evaluation and citation locators.
+Structured website views, 24-hour share links, CSV/XLSX recipient import,
+newsletter transformation, and audited email delivery.
 
-## Phase 4 --- KnowledgeArtifact: 4--6 days
+## Phase 4 — Scoped chat and clients
 
-Artifact schema, structured generation, evidence/citations, versioning,
-validation and persistence.
+Cited chat over attachable/swappable artifacts, responsive PWA behavior,
+and Chrome extension submission to the same backend API.
 
-## Phase 5 --- Evaluation: 3--5 days
+## Phase 5 — Improvement loop and connectors
 
-Benchmark dataset, retrieval metrics, groundedness/citation checks and
-regression harness.
+Preference profiles, consented feedback, model evaluation/release gates,
+and the first prioritized third-party connector.
 
-## Phase 6 --- Workspace: 4--6 days
+## Ongoing — Production readiness
 
-Dashboard, source/artifact libraries, artifact viewer,
-search/filter/tag/favorite/archive and review/edit UX.
+Security, authorization tests, monitoring, backups/restore exercises,
+rate limits, performance work, and deployment documentation continue
+through every phase.
 
-## Phase 7 --- Exports/integrations: 4--7 days
+## Schedule rule
 
-Markdown, PDF, DOCX, temporary public sharing and Gmail.
-
-## Phase 8 --- Workflow builder: 7--12 days
-
-Declarative workflow definitions, React Flow editor, node configuration,
-execution mapping and run history.
-
-## Phase 9 --- Production hardening: 4--7 days
-
-Rate limits, structured logging, error tracking, retries/idempotency,
-security review, dependency/performance work and backup/restore
-verification.
-
-## Phase 10 --- Portfolio polish: 2--4 days
-
-Architecture diagram, README, demo, benchmark results, ADRs, CI badges,
-deployment docs and resume bullets.
-
-## Total
-
-Roughly 6--10 weeks for a serious first version. Complete the POC first;
-if grounding/retrieval is weak, fix it before expanding UI.
+At the end of Phase 0, map the audited work to the 6–8 week target and
+identify what belongs in the first complete release. Preserve the quality
+gates for citations, ownership, and safe sharing; if time is short, defer
+lower-priority connector breadth or polish rather than skipping those
+gates.

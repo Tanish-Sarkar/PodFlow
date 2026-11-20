@@ -1,36 +1,37 @@
 # PodFlow --- Development and AI Agent Environment
 
+> **Status:** Supporting engineering-process guidance. The master specification controls product and architecture scope.
+
 ## Tools
 
-Git, Python 3.11+, Node.js LTS, Docker, PostgreSQL client tools, GitHub
-CLI, IDE and Playwright.
+Git, Python 3.13 subject to dependency compatibility, `uv`, Bun,
+Docker, PostgreSQL client tools, GitHub CLI, IDE and Playwright.
 
 Cloud/services: GitHub, Supabase, Vercel, Render, Google Cloud where
 OAuth/Gmail requires it, CodeRabbit.
 
 ## Agent setup
 
-Create:
+The repository already has `.agents/rules/rules_of_code.md` and a root `skills/` catalog. Use those as the current code-writing and task-specific procedure references; do not create a second competing skill directory under `.agents/`.
+
+Future agent work should keep guidance organized as:
 
 ``` text
 .agents/
   rules/
   workflows/
-  skills/
+  skills/ (repository root; see `skills/README.md`)
 ```
 
 Rules cover architecture boundaries, tests, security, migrations,
 secrets, branch policy and API/documentation updates.
 
-## Antigravity
+## AI agents
 
-Primary long-context/workspace agent for repository-wide changes,
-architecture work, multi-file features and large refactors.
-
-## Codex
-
-Second implementation/review agent for isolated tasks, debugging, tests
-and targeted refactors.
+Use agents with explicit file scope and acceptance criteria. Do not have
+two agents modify the same feature at the same time. Agents may help with
+implementation, tests, and documentation; human review remains required
+for consequential external actions and merge decisions.
 
 Do not have Antigravity and Codex modify the same feature
 simultaneously.
@@ -57,8 +58,11 @@ Expected output:
 
 ## Branching
 
-`main` is protected. Use `feat/*`, `fix/*`, `chore/*`. One feature per
-PR.
+`main` is the integration target. The current CI push filters include
+`feature/**`, `fix/**`, and `restructure/**`; align branch naming with
+the actual workflow or update both together. Keep one focused change per
+PR. Do not assume `feat/**` or `chore/**` triggers CI until the workflow
+is updated.
 
 ## PR gate
 

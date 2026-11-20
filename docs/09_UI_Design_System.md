@@ -1,5 +1,7 @@
 # PodFlow --- UI Design System
 
+> **Status:** Supporting UI direction. Website-view components and chat are part of the V2 product scope.
+
 ## Personality
 
 Calm, premium, technical and trustworthy. The product should feel like a
@@ -7,7 +9,7 @@ serious knowledge product, not a developer tool or AI gimmick.
 
 ## Navigation
 
-Home, Artifacts, Sources, Workflows, Integrations, Settings.
+Home, Artifacts, Sources, Chat, Workflows, Integrations, Settings.
 
 ## Palette
 
@@ -44,6 +46,21 @@ The flagship surface: Title → Thesis → Key insights → Claims + evidence
 → Quotes → Takeaways → Sources/citations → Edit/Share/Export/Send.
 
 Evidence should be visually connected to claims.
+
+## Website view
+
+An artifact website view is a polished, shareable presentation rather
+than the dashboard's editor. Use a constrained set of accessible blocks
+for thesis, narrative sections, key points, quoted evidence, sources,
+and optional visual callouts. The renderer consumes structured
+presentation data; generated page code is not allowed.
+
+## Chat
+
+Show active artifact/source attachments above the conversation as
+removable chips. Users can add, swap, or remove scopes. Every answer
+shows citations and identifies the source/artifact version when opened.
+When the selected knowledge lacks evidence, say so plainly.
 
 ## Workflow builder
 
