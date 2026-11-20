@@ -63,6 +63,13 @@ class Resource(Base, TimestampMixin):
             name="ck_resources_kind_url",
         ),
         Index("ix_resources_owner_created", "owner_id", "created_at"),
+        Index(
+            "uq_resources_owner_url",
+            "owner_id",
+            "submitted_url",
+            unique=True,
+            postgresql_where=sql_text("kind = 'url'"),
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)

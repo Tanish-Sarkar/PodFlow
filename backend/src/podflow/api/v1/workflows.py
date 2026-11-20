@@ -1,9 +1,13 @@
+import asyncio
 import hashlib
+import re
 import uuid
 from datetime import UTC, datetime, timedelta
+from urllib.parse import urlsplit, urlunsplit
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import delete, func, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -36,13 +40,82 @@ from podflow.schemas.database import (
     PresentationShareIssued,
     ProfileRead,
     PublicPresentationRead,
+    ResourceBatchCreate,
+    ResourceBatchItem,
+    ResourceBatchRead,
     ResourceCreate,
     ResourceRead,
 )
 from podflow.security.presentation_shares import generate_share_token
+from podflow.security.resource_probe import ProbeFailure, check_url_available
 
 router = APIRouter(prefix="/api/v1", tags=["workflows"])
 private_router = APIRouter(dependencies=[Depends(get_current_user)])
+_URL_SHAPE = re.compile(r"https?://[^/?#\s]+(?:[/?#][^\s]*)?\Z", re.IGNORECASE)
+_MAX_RESOURCE_LINES = 25
+_PROBE_CONCURRENCY = 5
+
+
+def _normalize_resource_url(value: str) -> str:
+    candidate = value.strip()
+    if (
+        len(candidate) > 2048
+        or not _URL_SHAPE.fullmatch(candidate)
+        or any(ord(char) < 32 or char.isspace() for char in candidate)
+    ):
+        raise ValueError("invalid_url")
+    try:
+        parts = urlsplit(candidate)
+        hostname = parts.hostname
+        port = parts.port
+        if (
+            not hostname
+            or parts.username
+            or parts.password
+            or parts.scheme.lower() not in {"http", "https"}
+        ):
+            raise ValueError("invalid_url")
+        hostname = hostname.rstrip(".").encode("idna").decode("ascii").lower()
+        default_port = 443 if parts.scheme.lower() == "https" else 80
+        if port not in {None, default_port}:
+            raise ValueError("invalid_port")
+        hostpart = f"[{hostname}]" if ":" in hostname else hostname
+        netloc = hostpart if port in {None, default_port} else f"{hostpart}:{port}"
+        return urlunsplit((parts.scheme.lower(), netloc, parts.path or "/", parts.query, ""))
+    except (UnicodeError, ValueError) as exc:
+        if str(exc) in {"invalid_url", "invalid_port"}:
+            raise
+        raise ValueError("invalid_url") from exc
+
+
+async def _resource_for_url(db: AsyncSession, owner_id: uuid.UUID, url: str) -> Resource | None:
+    result = await db.execute(
+        select(Resource).where(
+            Resource.owner_id == owner_id,
+            Resource.kind == "url",
+            Resource.submitted_url == url,
+        )
+    )
+    return result.scalar_one_or_none()
+
+
+async def _insert_url_resource(
+    db: AsyncSession, owner_id: uuid.UUID, url: str
+) -> tuple[Resource, bool]:
+    statement = (
+        pg_insert(Resource)
+        .values(owner_id=owner_id, kind="url", submitted_url=url, metadata_json={})
+        .on_conflict_do_nothing(
+            index_elements=[Resource.owner_id, Resource.submitted_url],
+            index_where=Resource.kind == "url",
+        )
+        .returning(Resource.id)
+    )
+    inserted = (await db.execute(statement)).scalar_one_or_none()
+    resource = await _resource_for_url(db, owner_id, url)
+    if resource is None:
+        raise HTTPException(500, "Resource registration failed")
+    return resource, inserted is not None
 
 
 @private_router.get("/auth/me", response_model=ProfileRead)
@@ -58,16 +131,120 @@ async def create_resource(
 ) -> Resource:
     if body.kind == "upload":
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, "File storage is not configured")
-    resource = Resource(
-        owner_id=user.auth_user_id,
-        kind=body.kind,
-        submitted_url=str(body.submitted_url) if body.submitted_url else None,
-        title=body.title,
-        metadata_json=body.metadata,
-    )
-    db.add(resource)
-    await db.flush()
+    try:
+        url = _normalize_resource_url(str(body.submitted_url))
+    except ValueError as exc:
+        raise HTTPException(422, "Invalid URL") from exc
+    existing = await _resource_for_url(db, user.auth_user_id, url)
+    if existing:
+        return existing
+    try:
+        await check_url_available(url)
+    except ProbeFailure as exc:
+        raise HTTPException(422, f"URL unavailable: {exc.code}") from exc
+    resource, _ = await _insert_url_resource(db, user.auth_user_id, url)
     return resource
+
+
+@private_router.post("/resources/batch", response_model=ResourceBatchRead)
+async def create_resources_batch(
+    body: ResourceBatchCreate,
+    user: UserProfile = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> ResourceBatchRead:
+    if len(body.text.encode("utf-8")) > 65_536:
+        raise HTTPException(422, "Batch text exceeds 64 KiB")
+    lines = [
+        (number, value.strip())
+        for number, value in enumerate(body.text.splitlines(), 1)
+        if value.strip()
+    ]
+    if not lines or len(lines) > _MAX_RESOURCE_LINES:
+        raise HTTPException(422, "Provide between 1 and 25 nonblank URL lines")
+
+    normalized: dict[int, str] = {}
+    outcomes: dict[int, ResourceBatchItem] = {}
+    first_line_by_url: dict[str, int] = {}
+    for line_number, value in lines:
+        try:
+            url = _normalize_resource_url(value)
+        except ValueError as exc:
+            outcomes[line_number] = ResourceBatchItem(
+                line_number=line_number, status="invalid", error_code=str(exc)
+            )
+            continue
+        if url in first_line_by_url:
+            outcomes[line_number] = ResourceBatchItem(
+                line_number=line_number,
+                submitted_url=url,
+                status="duplicate_in_batch",
+                duplicate_of_line=first_line_by_url[url],
+            )
+            continue
+        normalized[line_number] = url
+        first_line_by_url[url] = line_number
+
+    urls = list(normalized.values())
+    existing_result = await db.execute(
+        select(Resource).where(
+            Resource.owner_id == user.auth_user_id,
+            Resource.kind == "url",
+            Resource.submitted_url.in_(urls),
+        )
+    ) if urls else None
+    existing_by_url = {
+        resource.submitted_url: resource for resource in existing_result.scalars()
+    } if existing_result else {}
+    semaphore = asyncio.Semaphore(_PROBE_CONCURRENCY)
+
+    candidates: list[tuple[int, str]] = []
+    for line_number, url in normalized.items():
+        existing = existing_by_url.get(url)
+        if existing:
+            outcomes[line_number] = ResourceBatchItem(
+                line_number=line_number,
+                submitted_url=url,
+                status="already_exists",
+                resource=ResourceRead.model_validate(existing),
+            )
+        else:
+            candidates.append((line_number, url))
+
+    probe_results: dict[int, str | None] = {}
+
+    async def probe(line_number: int, url: str) -> None:
+        try:
+            async with semaphore:
+                await check_url_available(url)
+        except ProbeFailure as exc:
+            probe_results[line_number] = exc.code
+        else:
+            probe_results[line_number] = None
+
+    await asyncio.gather(*(probe(number, url) for number, url in candidates))
+    for line_number, url in candidates:
+        error_code = probe_results[line_number]
+        if error_code:
+            outcomes[line_number] = ResourceBatchItem(
+                line_number=line_number,
+                submitted_url=url,
+                status="unavailable",
+                error_code=error_code,
+            )
+            continue
+        resource, created = await _insert_url_resource(db, user.auth_user_id, url)
+        outcomes[line_number] = ResourceBatchItem(
+            line_number=line_number,
+            submitted_url=url,
+            status="created" if created else "already_exists",
+            resource=ResourceRead.model_validate(resource),
+        )
+    for line_number, outcome in tuple(outcomes.items()):
+        if outcome.status == "duplicate_in_batch":
+            first = outcomes.get(outcome.duplicate_of_line or -1)
+            if first and first.resource:
+                outcomes[line_number] = outcome.model_copy(update={"resource": first.resource})
+    return ResourceBatchRead(results=[outcomes[number] for number, _ in lines])
 
 
 @private_router.delete("/resources/{resource_id}", status_code=204)

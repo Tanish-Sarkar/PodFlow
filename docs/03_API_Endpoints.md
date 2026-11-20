@@ -7,7 +7,8 @@ All routes below use `/api/v1`. Private routes require a verified Supabase asymm
 | Method and path | Purpose | Auth | Request → response | Ownership boundary | Status |
 | --- | --- | --- | --- | --- | --- |
 | `GET /auth/me` | Bootstrap profile idempotently and return it | JWT | none → `ProfileRead` | verified JWT subject | Implemented; requires reviewed/applied profile INSERT grant migration |
-| `POST /resources` | Register URL metadata | JWT | `ResourceCreate` → `ResourceRead` | JWT owner | Persistence-only; upload returns 501 |
+| `POST /resources` | Availability-check and register one URL | JWT | `ResourceCreate` → `ResourceRead` | JWT owner | Synchronous; upload returns 501 |
+| `POST /resources/batch` | Validate, availability-check, deduplicate, and register pasted URLs | JWT | multiline `text` → per-line outcomes | JWT owner | Synchronous; bounded SSRF-safe probe; no extraction |
 | `GET /resources` | Paginated resource metadata | JWT | `limit`, `offset` → `ResourceRead[]` | owner filter | Persistence-only |
 | `GET /resources/{id}` | Read resource metadata | JWT | none → `ResourceRead` | owner filter | Persistence-only |
 | `DELETE /resources/{id}` | Delete owned resource metadata | JWT | none → 204 | owner filter | Persistence-only |

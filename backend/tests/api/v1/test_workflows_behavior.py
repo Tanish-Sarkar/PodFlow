@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import uuid
 from datetime import UTC, datetime
@@ -9,20 +10,22 @@ from fastapi import HTTPException, Response
 from podflow.api.access_logs import ShareTokenRedactionFilter
 from podflow.api.dependencies import auth
 from podflow.api.v1 import workflows
-from podflow.persistence.db.models.knowledge import ArtifactVersion, KnowledgeArtifact
+from podflow.persistence.db.models.knowledge import (
+    ArtifactVersion,
+    KnowledgeArtifact,
+    Resource,
+)
 from podflow.persistence.db.models.user import UserProfile
-from podflow.schemas.database import ConversationAttachmentsUpdate, ConversationRead
+from podflow.schemas.database import (
+    ConversationAttachmentsUpdate,
+    ConversationRead,
+    ResourceBatchCreate,
+)
 
 
 def run_sync(coroutine):
     """Drive coroutines whose mocked dependencies complete without external I/O."""
-    while True:
-        try:
-            yielded = coroutine.send(None)
-        except StopIteration as result:
-            return result.value
-        if yielded is not None:
-            raise AssertionError("test coroutine unexpectedly yielded external async work")
+    return asyncio.run(coroutine)
 
 
 class FakeResult:
@@ -178,6 +181,44 @@ def test_resource_delete_returns_not_found_for_unowned_record():
     with pytest.raises(HTTPException) as result:
         run_sync(run())
     assert result.value.status_code == 404
+
+
+def test_batch_registration_reports_created_and_same_paste_duplicate(monkeypatch):
+    resource = Resource(
+        id=uuid.uuid4(),
+        owner_id=uuid.uuid4(),
+        kind="url",
+        submitted_url="https://example.com/",
+        title=None,
+        metadata_json={},
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    db = FakeSession(
+        [
+            FakeResult(scalars=[]),
+            FakeResult(scalar=resource.id),
+            FakeResult(scalar=resource),
+        ]
+    )
+    user = UserProfile(id=uuid.uuid4(), auth_user_id=resource.owner_id)
+    probes = []
+
+    async def probe(url):
+        probes.append(url)
+
+    monkeypatch.setattr(workflows, "check_url_available", probe)
+    result = run_sync(
+        workflows.create_resources_batch(
+            ResourceBatchCreate(text="https://example.com\nhttps://example.com/"),
+            user,
+            db,
+        )
+    )
+
+    assert [item.status for item in result.results] == ["created", "duplicate_in_batch"]
+    assert result.results[1].resource.id == resource.id
+    assert probes == ["https://example.com/"]
     assert user.auth_user_id in db.statements[0].compile().params.values()
 
 

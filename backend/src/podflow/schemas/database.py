@@ -27,6 +27,25 @@ class ResourceCreate(BaseModel):
         return self
 
 
+class ResourceBatchCreate(BaseModel):
+    text: str = Field(min_length=1, max_length=65_536)
+
+
+class ResourceBatchItem(BaseModel):
+    line_number: int
+    submitted_url: str | None = None
+    status: Literal[
+        "created", "already_exists", "duplicate_in_batch", "unavailable", "invalid"
+    ]
+    resource: "ResourceRead | None" = None
+    duplicate_of_line: int | None = None
+    error_code: str | None = None
+
+
+class ResourceBatchRead(BaseModel):
+    results: list[ResourceBatchItem]
+
+
 class ResourceVersionCreate(BaseModel):
     version_number: int = Field(gt=0)
     content_hash: Annotated[

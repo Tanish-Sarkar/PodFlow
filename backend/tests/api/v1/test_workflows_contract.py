@@ -7,6 +7,7 @@ from pydantic import ValidationError
 
 from podflow.api.access_logs import ShareTokenRedactionFilter
 from podflow.api.app import create_app
+from podflow.api.v1.workflows import _normalize_resource_url
 from podflow.schemas.database import (
     ChatMessageCreate,
     ConversationAttachmentsUpdate,
@@ -51,6 +52,38 @@ def test_app_installs_access_log_token_redaction_filter():
 def test_resource_create_rejects_invalid_kind_url_combinations(payload):
     with pytest.raises(ValidationError):
         ResourceCreate.model_validate(payload)
+
+
+def test_resource_batch_route_is_authenticated_and_registered():
+    operation = create_app().openapi()["paths"]["/api/v1/resources/batch"]["post"]
+    assert operation["security"] == [{"HTTPBearer": []}]
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("HTTPS://Example.COM:443/Path#section", "https://example.com/Path"),
+        ("http://example.com", "http://example.com/"),
+        ("https://example.com/a?b=2&a=1", "https://example.com/a?b=2&a=1"),
+    ],
+)
+def test_resource_url_normalization_is_conservative(value, expected):
+    assert _normalize_resource_url(value) == expected
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "ftp://example.com/file",
+        "https://user:pass@example.com/",
+        "https://example.com:444/",
+        "https://example.com/a b",
+        "https://example.com/" + "a" * 2048,
+    ],
+)
+def test_resource_url_normalization_rejects_unsafe_or_unsupported_urls(value):
+    with pytest.raises(ValueError):
+        _normalize_resource_url(value)
 
 
 def test_attachment_request_rejects_more_than_100_versions():
